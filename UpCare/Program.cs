@@ -27,7 +27,7 @@ namespace UpCare
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-
+            // Project Moooooooooooooooott (x_x)
             // UpCare Connection & Services Configuration
             builder.Services.AddDbContext<UpCareDbContext>(options =>
             {
