@@ -28,6 +28,12 @@ namespace UpCare
             builder.Services.AddSwaggerGen();
 
             // Project Moooooooooooooooott (x_x)
+            ////////////////////////// 
+            ////////////////////////// 
+            ////////////////////////// tables pendings (prescription and dependent tables)
+            //////////////////////////        pendings (bills and dependent tables)
+            ////////////////////////// 
+            //////////////////////////
             // UpCare Connection & Services Configuration
             builder.Services.AddDbContext<UpCareDbContext>(options =>
             {
