@@ -24,5 +24,8 @@ namespace Repository.UpCareData
         public DbSet<NurseCare> NurseCares { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<PatientBookRoom> PatientBookRooms { get; set; }
+        public DbSet<DoctorDoOperation> DoctorDoOperations { get; set; }
+        public DbSet<PatientAppointment> PatientAppointments { get; set; }
+        public DbSet<PatientConsultation> PatientConsultations { get; set; }
     }
 }
