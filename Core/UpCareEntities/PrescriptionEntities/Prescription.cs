@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.UpCareEntities
+namespace Core.UpCareEntities.PrescriptionEntities
 {
     public class Prescription : BaseEntity
     {

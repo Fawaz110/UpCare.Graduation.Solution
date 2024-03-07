@@ -1,4 +1,4 @@
-﻿namespace Core.UpCareEntities
+﻿namespace Core.UpCareEntities.PrescriptionEntities
 {
     public class DoctorGivePrescription
     {

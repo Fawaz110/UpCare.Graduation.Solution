@@ -1,4 +1,4 @@
-﻿using Core.UpCareEntities;
+﻿using Core.UpCareEntities.PrescriptionEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;

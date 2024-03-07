@@ -1,5 +1,7 @@
 ﻿using Core.Entities.UpCareEntities;
 using Core.UpCareEntities;
+using Core.UpCareEntities.BillEntities;
+using Core.UpCareEntities.PrescriptionEntities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -27,10 +29,19 @@ namespace Repository.UpCareData
         public DbSet<DoctorDoOperation> DoctorDoOperations { get; set; }
         public DbSet<PatientAppointment> PatientAppointments { get; set; }
         public DbSet<PatientConsultation> PatientConsultations { get; set; }
+
+        #region Prescription & Related Tables
         public DbSet<Prescription> Prescriptions { get; set; }
         public DbSet<MedicineInPrescription> MedicineInPrescriptions { get; set; }
         public DbSet<DoctorGivePrescription> DoctorGivePrescriptions { get; set; }
         public DbSet<CheckupInPrescription> CheckupInPrescriptions { get; set; }
         public DbSet<RadiologyInPrescription> RadiologyInPrescriptions { get; set; }
+        #endregion
+        
+        #region Bills & Realted Tables
+        public DbSet<Bill> Bills { get; set; }
+        public DbSet<CheckupInBill> CheckupInBills { get; set; }
+        public DbSet<MedicineInBill> MedicineInBills { get; set; } 
+        #endregion
     }
 }
