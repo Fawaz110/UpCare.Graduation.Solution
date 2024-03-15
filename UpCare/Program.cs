@@ -1,6 +1,8 @@
+using Core.Repositories.Contract;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Repository;
 using Repository.SecondaryData.AdminData;
 using Repository.SecondaryData.DoctorData;
 using Repository.SecondaryData.LabsData.CheckupLabData;
@@ -28,6 +30,8 @@ namespace UpCare
             builder.Services.AddSwaggerGen();
 
             // Project Moooooooooooooooott (x_x)
+
+            #region Connections
             // UpCare Connection & Services Configuration
             builder.Services.AddDbContext<UpCareDbContext>(options =>
             {
@@ -122,7 +126,14 @@ namespace UpCare
             {
 
             }).AddRoles<IdentityRole>().AddEntityFrameworkStores<PharmacyDbContext>();
-            // End Of PharmacyDbContext Services
+            // End Of PharmacyDbContext Services 
+            #endregion
+
+            #region ServicesConfigurations
+            
+            builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
+
+            #endregion
 
             var app = builder.Build();
 
