@@ -1,6 +1,7 @@
 using Core.Repositories.Contract;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Repository;
 using Repository.SecondaryData.AdminData;
@@ -12,6 +13,7 @@ using Repository.SecondaryData.PatientData;
 using Repository.SecondaryData.PharmacyData;
 using Repository.SecondaryData.ReceptionistData;
 using Repository.UpCareData;
+using UpCare.Errors;
 using UpCare.Extensions;
 
 namespace UpCare
@@ -132,6 +134,23 @@ namespace UpCare
             #region ServicesConfigurations
             
             builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = (actionContext) =>
+                {
+                    var errors = actionContext.ModelState.Where(p => p.Value.Errors.Count() > 0)
+                                                         .SelectMany(p => p.Value.Errors)
+                                                         .Select(e => e.ErrorMessage)
+                                                         .ToArray();
+                    var validationErrorResponse = new ApiValidationErrorResponse()
+                    {
+                        Errors =errors
+                    };
+
+                    return new BadRequestObjectResult(validationErrorResponse);
+                };
+            });
 
             #endregion
 
