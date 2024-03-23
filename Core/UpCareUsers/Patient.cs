@@ -20,6 +20,6 @@ namespace Core.UpCareUsers
         public DateTime DateOfBirth { get; set; }
         public string? BloodType { get; set; }
         public Gender Gender { get; set; }
-        public string FK_ReceptionistId { get; set; }
+        public string? FK_ReceptionistId { get; set; }
     }
 }

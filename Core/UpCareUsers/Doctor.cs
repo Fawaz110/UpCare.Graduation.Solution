@@ -17,6 +17,6 @@ namespace Core.UpCareUsers
         public bool IsSurgeon { get; set; } 
         public decimal ConsultationPrice { get; set; }
         public decimal AppointmentPrice { get; set; }
-        public string FK_AdminId { get; set; }
+        public string? FK_AdminId { get; set; }
     }
 }

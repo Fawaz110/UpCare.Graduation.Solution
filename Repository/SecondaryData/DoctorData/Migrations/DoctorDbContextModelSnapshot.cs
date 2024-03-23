@@ -52,7 +52,6 @@ namespace Repository.DoctorData.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FK_AdminId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")

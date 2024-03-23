@@ -16,6 +16,6 @@ namespace Core.UpCareUsers
         [RegularExpression(@"^01[0-2,5]{1}[0-9]{8}$", ErrorMessage = "Invalid Phone Number")]
         public string PhoneNumber { get; set; }
         public string Location { get; set; }
-        public string FK_AdminId { get; set; }
+        public string? FK_AdminId { get; set; }
     }
 }

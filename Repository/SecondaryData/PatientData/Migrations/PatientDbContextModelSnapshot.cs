@@ -52,7 +52,6 @@ namespace Repository.PatientData.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FK_ReceptionistId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")

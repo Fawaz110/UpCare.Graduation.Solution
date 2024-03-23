@@ -3,17 +3,19 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Repository.SecondaryData.PharmacyData;
+using Repository.SecondaryData.LabsData.RadiologyLabData;
 
 #nullable disable
 
-namespace Repository.PharmacyData.Migrations
+namespace Repository.LabsData.RadiologyLabData.Migrations
 {
-    [DbContext(typeof(PharmacyDbContext))]
-    partial class PharmacyDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(RadiologyDbContext))]
+    [Migration("20240323154941_allowNullableFK_Id")]
+    partial class allowNullableFK_Id
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +24,7 @@ namespace Repository.PharmacyData.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Core.UpCareUsers.Pharmacy", b =>
+            modelBuilder.Entity("Core.UpCareUsers.RadiologyLab", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -243,7 +245,7 @@ namespace Repository.PharmacyData.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Core.UpCareUsers.Pharmacy", null)
+                    b.HasOne("Core.UpCareUsers.RadiologyLab", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -252,7 +254,7 @@ namespace Repository.PharmacyData.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Core.UpCareUsers.Pharmacy", null)
+                    b.HasOne("Core.UpCareUsers.RadiologyLab", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -267,7 +269,7 @@ namespace Repository.PharmacyData.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.UpCareUsers.Pharmacy", null)
+                    b.HasOne("Core.UpCareUsers.RadiologyLab", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -276,7 +278,7 @@ namespace Repository.PharmacyData.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Core.UpCareUsers.Pharmacy", null)
+                    b.HasOne("Core.UpCareUsers.RadiologyLab", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

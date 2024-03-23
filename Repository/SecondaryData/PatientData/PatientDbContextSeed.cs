@@ -22,7 +22,7 @@ namespace Repository.SecondaryData.PatientData
                     PhoneNumber = "01123456789",
                     Address = "Minufia",
                     Email = "fawaz@admin.com",
-                    UserName = "Mustafa"
+                    UserName = "Mustafa",
                 };
 
                 var result = await userManager.CreateAsync(user, "Fawaz@123");

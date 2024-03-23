@@ -102,10 +102,11 @@ namespace UpCare
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("PatientConnection"));
             });
-            builder.Services.AddIdentityCore<Patient>(options =>
+            builder.Services.AddIdentity<Patient, IdentityRole>(options =>
             {
 
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<PatientDbContext>();
+            }).AddEntityFrameworkStores<PatientDbContext>()
+            .AddDefaultTokenProviders();
             // End Of Patient Services
 
             // RadiologyDbContext Connection & Services Configuration
@@ -166,6 +167,8 @@ namespace UpCare
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
