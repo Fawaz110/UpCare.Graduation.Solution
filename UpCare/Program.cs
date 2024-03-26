@@ -1,4 +1,5 @@
 using Core.Repositories.Contract;
+using Core.Services.Contract;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using Repository.SecondaryData.PatientData;
 using Repository.SecondaryData.PharmacyData;
 using Repository.SecondaryData.ReceptionistData;
 using Repository.UpCareData;
+using Service;
 using UpCare.Errors;
 using UpCare.Extensions;
 
@@ -133,6 +135,7 @@ namespace UpCare
             #endregion
 
             #region ServicesConfigurations
+            builder.Services.AddIdentityServices();
             
             builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
 
@@ -152,7 +155,6 @@ namespace UpCare
                     return new BadRequestObjectResult(validationErrorResponse);
                 };
             });
-
             #endregion
 
             var app = builder.Build();

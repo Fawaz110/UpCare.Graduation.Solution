@@ -1,6 +1,8 @@
-﻿using Core.UpCareUsers;
+﻿using Core.Services.Contract;
+using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using UpCare.DTOs;
 using UpCare.Errors;
 
@@ -9,11 +11,13 @@ namespace UpCare.Controllers
     public class PatientController : BaseApiController
     {
         private readonly UserManager<Patient> _userManager;
+        private readonly IAuthServices _authServices;
         private readonly SignInManager<Patient> _signInManager;
 
-        public PatientController(UserManager<Patient> userManager, SignInManager<Patient> signInManager)
+        public PatientController(UserManager<Patient> userManager,IAuthServices authServices, SignInManager<Patient> signInManager)
         {
             _userManager = userManager;
+            _authServices = authServices;
             _signInManager = signInManager;
         }
         [HttpPost("login")] // POST: /api/patient/login
@@ -24,17 +28,38 @@ namespace UpCare.Controllers
                 return Unauthorized(new ApiResponse(401));
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
-            
+
             if (result.Succeeded is false)
                 return Unauthorized(new ApiResponse(401));
 
             return Ok(new UserDto()
             {
-                FirstName = user.FirstName, 
+                FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
                 Email = model.Email,
-                Token = "this will be token"
+                Token = await _authServices.CreateTokenAsync(user,_userManager)
+            });
+        }
+        [HttpPost("register")]// POST: /api/patient/register
+        public async Task<ActionResult<UserDto>> Register(RegisterDto model){
+            var user = new Patient()
+            {
+                FirstName = model.DisplayFirstName,
+                LastName= model.DisplayLastName,
+                Email = model.Email,
+                UserName = model.Email.Split("@")[0],
+                PhoneNumber=model.PhoneNumber,
+                Address=model.Address,
+            };
+            var result=await _userManager.CreateAsync(user,model.Password);
+            if (result.Succeeded is false) return BadRequest(new ApiResponse(400));
+            return Ok(new UserDto()
+            {
+                FirstName=user.FirstName,
+                LastName=user.LastName,
+                Email=user.Email,
+                Token = await _authServices.CreateTokenAsync(user, _userManager)
             });
         }
     }

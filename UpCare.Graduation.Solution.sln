@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpCare", "UpCare\UpCare.csproj", "{728C9CEE-5D73-4BA0-B0D0-41F34FE97D7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UpCare", "UpCare\UpCare.csproj", "{728C9CEE-5D73-4BA0-B0D0-41F34FE97D7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{807F32C4-A9E8-45B2-B147-180B20EECDFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{807F32C4-A9E8-45B2-B147-180B20EECDFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{5B3CFF2C-90C0-44B0-B206-35DC73836C42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{5B3CFF2C-90C0-44B0-B206-35DC73836C42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{600AAF0D-5CF1-4695-985A-D2274B88391C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Service\Service.csproj", "{600AAF0D-5CF1-4695-985A-D2274B88391C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
