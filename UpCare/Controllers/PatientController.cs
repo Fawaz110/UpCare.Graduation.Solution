@@ -2,7 +2,7 @@
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.PowerBI.Api.Models;
 using UpCare.DTOs;
 using UpCare.Errors;
 
@@ -42,18 +42,46 @@ namespace UpCare.Controllers
             });
         }
         [HttpPost("register")]// POST: /api/patient/register
-        public async Task<ActionResult<UserDto>> Register(RegisterDto model){
+        public async Task<ActionResult<UserDto>> Register(RegisterDto model)
+        {
             var user = new Patient()
             {
-                FirstName = model.DisplayFirstName,
-                LastName= model.DisplayLastName,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
                 Email = model.Email,
                 UserName = model.Email.Split("@")[0],
-                PhoneNumber=model.PhoneNumber,
-                Address=model.Address,
+                PhoneNumber = model.PhoneNumber,
+                Address = model.Address,
+                BloodType = model.BloodType,
+                FK_ReceptionistId = model.ReceptionistId,
+                Gender = (model.Gender == "male") ? Gender.Male : Gender.Female,
+                //DateOfBirth = model.DateOfBirth,
             };
-            var result=await _userManager.CreateAsync(user,model.Password);
-            if (result.Succeeded is false) return BadRequest(new ApiResponse(400));
+            //user.DateOfBirth.Day = model.DateOfBirth.
+            var dayMonthYear = model.DateOfBirth.Split("-").Select(int.Parse).ToArray();
+
+            if (dayMonthYear.Length == 3 &&
+                dayMonthYear[0] >= 1 && dayMonthYear[0] <= 31 &&
+                dayMonthYear[1] >= 1 && dayMonthYear[1] <= 12 && 
+                dayMonthYear[2] >= 1900 && dayMonthYear[2] <= DateTime.Now.Year) 
+                // Create DateTime object if values are valid
+                user.DateOfBirth = new DateTime(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
+            
+            else
+                return BadRequest(new ApiValidationErrorResponse());
+            var result = await _userManager.CreateAsync(user,model.Password);
+
+            if (result.Succeeded is false)
+            {
+                var error = new ApiValidationErrorResponse();
+                foreach(var item in result.Errors)
+                {
+                    error.Errors.Add(item.Code);
+                }
+
+                return BadRequest(error);
+            }
+
             return Ok(new UserDto()
             {
                 FirstName=user.FirstName,

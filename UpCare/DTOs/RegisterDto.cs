@@ -1,13 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Core.UpCareUsers;
+using System.ComponentModel.DataAnnotations;
 
 namespace UpCare.DTOs
 {
     public class RegisterDto
     {
         [Required]
-        public string DisplayFirstName { get; set; }
+        public string FirstName { get; set; }
         [Required]
-        public string DisplayLastName { get; set; }
+        public string LastName { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -17,6 +18,10 @@ namespace UpCare.DTOs
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{1,6}$",
             ErrorMessage = "Password Must Have Minimum six characters, at least one uppercase letter, one lowercase letter, one number and one special character:")]
         public string Password { get; set; }
-        public string Address { get; set; }
+        public string Gender { get; set; }
+        public string? Address { get; set; }
+        public string DateOfBirth { get; set; }
+        public string? BloodType { get; set; }
+        public string? ReceptionistId { get; set; }
     }
 }

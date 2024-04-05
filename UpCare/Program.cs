@@ -149,7 +149,7 @@ namespace UpCare
                                                          .ToArray();
                     var validationErrorResponse = new ApiValidationErrorResponse()
                     {
-                        Errors =errors
+                        Errors = errors.ToList()
                     };
 
                     return new BadRequestObjectResult(validationErrorResponse);
