@@ -2,6 +2,7 @@ using Core.Repositories.Contract;
 using Core.Services.Contract;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Repository;
@@ -52,7 +53,7 @@ namespace UpCare
             builder.Services.AddIdentityCore<Admin>(options =>
             {
 
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<AdminDbContext>();
+            }).AddEntityFrameworkStores<AdminDbContext>();
             // End Of Admin Services
 
             // Receptionist Connection & Services Configuration
@@ -63,19 +64,8 @@ namespace UpCare
             builder.Services.AddIdentityCore<Receptionist>(options =>
             {
 
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<ReceptionistDbContext>();
+            }).AddEntityFrameworkStores<ReceptionistDbContext>();
             // End Of Receptionist Services
-
-            // Doctor Connection & Services Configuration
-            builder.Services.AddDbContext<DoctorDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DoctorConnection"));
-            });
-            builder.Services.AddIdentityCore<Doctor>(options =>
-            {
-
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<DoctorDbContext>();
-            // End Of Doctor Services
 
             // Nurse Connection & Services Configuration
             builder.Services.AddDbContext<NurseDbContext>(options =>
@@ -85,7 +75,7 @@ namespace UpCare
             builder.Services.AddIdentityCore<Nurse>(options =>
             {
 
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<NurseDbContext>();
+            }).AddEntityFrameworkStores<NurseDbContext>();
             // End Of Nurse Services
 
             // CheckupLabs Connection & Services Configuration
@@ -96,7 +86,7 @@ namespace UpCare
             builder.Services.AddIdentityCore<CheckupLab>(options =>
             {
 
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<CheckupLabDbContext>();
+            }).AddEntityFrameworkStores<CheckupLabDbContext>();
             // End Of Lab Services
 
             // Patient Connection & Services Configuration
@@ -111,6 +101,22 @@ namespace UpCare
             .AddDefaultTokenProviders();
             // End Of Patient Services
 
+            // Doctor Connection & Services Configuration
+            builder.Services.AddDbContext<DoctorDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DoctorConnection"));
+            });
+
+            builder.Services.AddIdentityCore<Doctor>(options =>
+            {
+
+            })
+            .AddEntityFrameworkStores<DoctorDbContext>()
+            .AddDefaultTokenProviders();
+
+            //builder.Services.AddScoped(typeof(IUserRoleStore<Doctor>));
+            // End Of Doctor Services
+
             // RadiologyDbContext Connection & Services Configuration
             builder.Services.AddDbContext<RadiologyDbContext>(options =>
             {
@@ -119,7 +125,7 @@ namespace UpCare
             builder.Services.AddIdentityCore<RadiologyLab>(options =>
             {
 
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<RadiologyDbContext>();
+            }).AddEntityFrameworkStores<RadiologyDbContext>();
             // End Of Radiology Services
 
             // PharmacyDbContext Connection & Services Configuration
@@ -130,13 +136,13 @@ namespace UpCare
             builder.Services.AddIdentityCore<Pharmacy>(options =>
             {
 
-            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<PharmacyDbContext>();
+            }).AddEntityFrameworkStores<PharmacyDbContext>();
             // End Of PharmacyDbContext Services 
             #endregion
 
             #region ServicesConfigurations
             builder.Services.AddIdentityServices();
-            
+
             builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
 
             builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -173,7 +179,6 @@ namespace UpCare
             app.UseAuthentication();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

@@ -24,10 +24,11 @@ namespace Service
             var authClaims = new List<Claim>()
             {
                 new Claim(ClaimTypes.GivenName,patient.UserName),
-                new Claim(ClaimTypes.Email,patient.Email),
+                new Claim(ClaimTypes.Email,patient.Email)
             };
 
             var userRoles = await userManager.GetRolesAsync(patient);
+
             foreach (var role in userRoles)
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
 
@@ -39,11 +40,36 @@ namespace Service
                 expires: DateTime.UtcNow.AddDays(double.Parse(_configuration["JWT:DurationInDays"])),
                 claims:authClaims,
                 signingCredentials:new SigningCredentials(authKey,SecurityAlgorithms.HmacSha256Signature)
-
-                
                 );
 
            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<string> CreateTokenAsync(Doctor doctor, UserManager<Doctor> userManager)
+        {
+            // Private Claims (User-Defined)
+            var authClaims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.GivenName,doctor.UserName),
+                new Claim(ClaimTypes.Email,doctor.Email)
+            };
+
+            //var userRoles = await userManager.GetRolesAsync(doctor);
+
+            //foreach (var role in userRoles)
+            //    authClaims.Add(new Claim(ClaimTypes.Role, role));
+
+            var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
+
+            var token = new JwtSecurityToken(
+                audience: _configuration["JWT:ValidAudience"],
+                issuer: _configuration["JWT:ValidIssuer"],
+                expires: DateTime.UtcNow.AddDays(double.Parse(_configuration["JWT:DurationInDays"])),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authKey, SecurityAlgorithms.HmacSha256Signature)
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

@@ -18,10 +18,5 @@ namespace UpCare.DTOs
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{1,6}$",
             ErrorMessage = "Password Must Have Minimum six characters, at least one uppercase letter, one lowercase letter, one number and one special character:")]
         public string Password { get; set; }
-        public string Gender { get; set; }
-        public string? Address { get; set; }
-        public string DateOfBirth { get; set; }
-        public string? BloodType { get; set; }
-        public string? ReceptionistId { get; set; }
     }
 }
