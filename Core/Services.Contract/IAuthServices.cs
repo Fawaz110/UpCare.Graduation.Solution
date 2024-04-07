@@ -12,6 +12,6 @@ namespace Core.Services.Contract
         Task<string> CreateTokenAsync(Receptionist user, UserManager<Receptionist> userManager);
         Task<string> CreateTokenAsync(RadiologyLab user, UserManager<RadiologyLab> userManager);
         Task<string> CreateTokenAsync(CheckupLab checkupLab, UserManager<CheckupLab> userManager);
-
+        Task<string> CreateTokenAsync(Admin admin, UserManager<Admin> userManager);
     }
 }

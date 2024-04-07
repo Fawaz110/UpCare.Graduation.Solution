@@ -90,7 +90,7 @@ namespace UpCare.Controllers
                 UserRole = "doctor"
             });
         }
-        [HttpGet("search")] // GET: api/doctor/search?nameSearchTerm
+        [HttpGet("search")] // GET: api/doctor/search?nameSearchTerm=string
         public async Task<ActionResult<List<Doctor>>> Search([FromQuery] string nameSearchTerm)
         {
             var doctors = await _userManager.Users.Where(p => p.FirstName.Trim().ToLower().Contains(nameSearchTerm.Trim().ToLower())
