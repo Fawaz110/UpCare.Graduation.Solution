@@ -10,27 +10,26 @@ using UpCare.Errors;
 
 namespace UpCare.Controllers
 {
-    public class DoctorController : BaseApiController
+    public class NurseController : BaseApiController
     {
-        private readonly UserManager<Doctor> _userManager;
+        private readonly UserManager<Nurse> _userManager;
         private readonly IAuthServices _authServices;
-        private readonly SignInManager<Doctor> _signInManager;
+        private readonly SignInManager<Nurse> _signInManager;
 
-        public DoctorController(
-            UserManager<Doctor> userManager, 
-            IAuthServices authServices, 
-            SignInManager<Doctor> signInManager)
+        public NurseController(
+            UserManager<Nurse> userManager,
+            IAuthServices authServices,
+            SignInManager<Nurse> signInManager 
+            )
         {
             _userManager = userManager;
             _authServices = authServices;
             _signInManager = signInManager;
         }
-
-        [HttpPost("login")] // POST: /api/doctor/login
-        public async Task<ActionResult<UserDto>> Login(LoginDto model)
+        [HttpPost("login")] // POST: /api/nurse/login
+        public async Task<ActionResult<UserDto>> Login(LoginDto model) 
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
-
             if (user is null)
                 return Unauthorized(new ApiResponse(401, "incorrect email or password"));
 
@@ -38,7 +37,6 @@ namespace UpCare.Controllers
 
             if (result.Succeeded is false)
                 return Unauthorized(new ApiResponse(401, "incorrect email or password"));
-
             return Ok(new UserDto()
             {
                 FirstName = user.FirstName,
@@ -46,14 +44,13 @@ namespace UpCare.Controllers
                 UserName = user.UserName,
                 Email = model.Email,
                 Token = await _authServices.CreateTokenAsync(user, _userManager),
-                UserRole = "doctor"
+                UserRole = "nurse"
             });
         }
-
-        [HttpPost("add")]// POST: /api/doctor/add
-        public async Task<ActionResult<UserDto>> Register(DoctorRegisterDto model)
+        [HttpPost("add")]// POST: /api/nurse/add
+        public async Task<ActionResult<UserDto>> Register(NurseRegisterDto model)
         {
-            var user = new Doctor()
+            var user = new Nurse()
             {
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -61,13 +58,9 @@ namespace UpCare.Controllers
                 UserName = model.Email.Split("@")[0],
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address,
-                Speciality = model.Speciality,
-                IsSurgeon = model.IsSurgeon,
-                ConsultationPrice = model.ConsultationPrice,
-                AppointmentPrice = model.AppointmentPrice,
-                FK_AdminId = model.AdminId, 
+                FK_AdminId = model.AdminId,
             };
-            
+
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded is false)
@@ -87,19 +80,19 @@ namespace UpCare.Controllers
                 LastName = user.LastName,
                 Email = user.Email,
                 Token = await _authServices.CreateTokenAsync(user, _userManager),
-                UserRole = "doctor"
+                UserRole = "nurse"
             });
         }
-        [HttpGet("search")] // GET: api/doctor/search?nameSearchTerm
-        public async Task<ActionResult<List<Doctor>>> Search([FromQuery] string nameSearchTerm)
+        [HttpGet("search")] // GET: api/nurse/search?nameSearchTerm
+        public async Task<ActionResult<List<Nurse>>> Search([FromQuery] string nameSearchTerm)
         {
-            var doctors = await _userManager.Users.Where(p => p.FirstName.Trim().ToLower().Contains(nameSearchTerm.Trim().ToLower())
+            var nurses = await _userManager.Users.Where(p => p.FirstName.Trim().ToLower().Contains(nameSearchTerm.Trim().ToLower())
                                                             || p.LastName.Trim().ToLower().Contains(nameSearchTerm.Trim().ToLower()))
                                                    .AsNoTracking().ToListAsync();
-            if (doctors.Count() == 0)
-                return BadRequest(new ApiResponse(404, "No doctors matches search term"));
+            if (nurses.Count() == 0)
+                return BadRequest(new ApiResponse(404, "No nurses matches search term"));
 
-            return Ok(doctors);
+            return Ok(nurses);
         }
     }
 }

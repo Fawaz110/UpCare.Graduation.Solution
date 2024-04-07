@@ -5,28 +5,27 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UpCare.DTOs;
-using UpCare.DTOs.StaffDTOs;
+using UpCare.DTOs.LabDTOs;
 using UpCare.Errors;
 
 namespace UpCare.Controllers
 {
-    public class DoctorController : BaseApiController
+    public class CheckupLabController : BaseApiController
     {
-        private readonly UserManager<Doctor> _userManager;
+        private readonly UserManager<CheckupLab> _userManager;
         private readonly IAuthServices _authServices;
-        private readonly SignInManager<Doctor> _signInManager;
+        private readonly SignInManager<CheckupLab> _signInManager;
 
-        public DoctorController(
-            UserManager<Doctor> userManager, 
-            IAuthServices authServices, 
-            SignInManager<Doctor> signInManager)
+        public CheckupLabController(
+            UserManager<CheckupLab> userManager,
+            IAuthServices authServices,
+            SignInManager<CheckupLab> signInManager) 
         {
             _userManager = userManager;
             _authServices = authServices;
             _signInManager = signInManager;
         }
-
-        [HttpPost("login")] // POST: /api/doctor/login
+        [HttpPost("login")] // POST: /api/checkupLab/login
         public async Task<ActionResult<UserDto>> Login(LoginDto model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
@@ -41,33 +40,26 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FirstName = user.Name,
                 UserName = user.UserName,
                 Email = model.Email,
                 Token = await _authServices.CreateTokenAsync(user, _userManager),
-                UserRole = "doctor"
+                UserRole = "checkupLab"
             });
         }
-
-        [HttpPost("add")]// POST: /api/doctor/add
-        public async Task<ActionResult<UserDto>> Register(DoctorRegisterDto model)
+        [HttpPost("add")]// POST: /api/checkupLab/add
+        public async Task<ActionResult<UserDto>> Register(CheckupLabRegisterDto model)
         {
-            var user = new Doctor()
+            var user = new CheckupLab()
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
+                Name = model.FirstName,
                 Email = model.Email,
                 UserName = model.Email.Split("@")[0],
                 PhoneNumber = model.PhoneNumber,
-                Address = model.Address,
-                Speciality = model.Speciality,
-                IsSurgeon = model.IsSurgeon,
-                ConsultationPrice = model.ConsultationPrice,
-                AppointmentPrice = model.AppointmentPrice,
-                FK_AdminId = model.AdminId, 
+                Location = model.Location,
+                FK_AdminId = model.AdminId,
             };
-            
+
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded is false)
@@ -83,23 +75,21 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FirstName = user.Name,
                 Email = user.Email,
+                UserName = user.UserName,
                 Token = await _authServices.CreateTokenAsync(user, _userManager),
-                UserRole = "doctor"
+                UserRole = "checkupLab"
             });
         }
-        [HttpGet("search")] // GET: api/doctor/search?nameSearchTerm
-        public async Task<ActionResult<List<Doctor>>> Search([FromQuery] string nameSearchTerm)
+        [HttpGet("search")] // GET: api/checkupLab/search?nameSearchTerm
+        public async Task<ActionResult<List<CheckupLab>>> Search([FromQuery] string nameSearchTerm)
         {
-            var doctors = await _userManager.Users.Where(p => p.FirstName.Trim().ToLower().Contains(nameSearchTerm.Trim().ToLower())
-                                                            || p.LastName.Trim().ToLower().Contains(nameSearchTerm.Trim().ToLower()))
-                                                   .AsNoTracking().ToListAsync();
-            if (doctors.Count() == 0)
-                return BadRequest(new ApiResponse(404, "No doctors matches search term"));
+            var checkupLabs = await _userManager.Users.Where(p => p.Name.Trim().ToLower().Contains(nameSearchTerm.Trim().ToLower())).AsNoTracking().ToListAsync();
+            if (checkupLabs.Count() == 0)
+                return BadRequest(new ApiResponse(404, "No checkupLabs matches search term"));
 
-            return Ok(doctors);
+            return Ok(checkupLabs);
         }
     }
 }

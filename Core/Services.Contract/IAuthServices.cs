@@ -8,5 +8,10 @@ namespace Core.Services.Contract
     {
         Task<string> CreateTokenAsync(Patient patient, UserManager<Patient> userManager);
         Task<string> CreateTokenAsync(Doctor doctor, UserManager<Doctor> userManager);
+        Task<string> CreateTokenAsync(Nurse user, UserManager<Nurse> userManager);
+        Task<string> CreateTokenAsync(Receptionist user, UserManager<Receptionist> userManager);
+        Task<string> CreateTokenAsync(RadiologyLab user, UserManager<RadiologyLab> userManager);
+        Task<string> CreateTokenAsync(CheckupLab checkupLab, UserManager<CheckupLab> userManager);
+
     }
 }
