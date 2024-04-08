@@ -183,5 +183,27 @@ namespace Service
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public async Task<string> CreateTokenAsync(Pharmacy pharmacy, UserManager<Pharmacy> userManager)
+        {
+            // Private Claims (User-Defined)
+            var authClaims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.GivenName,pharmacy.UserName),
+                new Claim(ClaimTypes.Email,pharmacy.Email)
+            };
+
+            var authKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
+
+            var token = new JwtSecurityToken(
+                audience: _configuration["JWT:ValidAudience"],
+                issuer: _configuration["JWT:ValidIssuer"],
+                expires: DateTime.UtcNow.AddDays(double.Parse(_configuration["JWT:DurationInDays"])),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authKey, SecurityAlgorithms.HmacSha256Signature)
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Core.Services.Contract;
 using Core.UpCareUsers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UpCare.DTOs;
