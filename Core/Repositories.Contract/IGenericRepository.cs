@@ -9,8 +9,8 @@ namespace Core.Repositories.Contract
         Task<ICollection<TEntity>> GetAllAsync();
         Task<TEntity> GetByIdWithSpecsAsync(ISpecifications<TEntity> spec);
         Task<ICollection<TEntity>> GetAllWithSpecsAsync(ISpecifications<TEntity> spec);
-
         void Update(TEntity entity);
         void Delete(TEntity entity);
+        Task Add(TEntity entity);
     }
 }

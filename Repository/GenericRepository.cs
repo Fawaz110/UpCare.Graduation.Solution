@@ -15,6 +15,9 @@ namespace Repository
             _context = context;
         }
 
+        public async Task Add(TEntity entity)
+            => await _context.Set<TEntity>().AddAsync(entity);
+
         public void Delete(TEntity entity)
             => _context.Set<TEntity>().Remove(entity);
         
@@ -24,13 +27,11 @@ namespace Repository
         public async Task<ICollection<TEntity>> GetAllWithSpecsAsync(ISpecifications<TEntity> spec)
             => await ApplySpecifications(spec).ToListAsync();
 
-
         public async Task<TEntity> GetByIdAsync(int id)
             => await _context.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == id);
 
         public async Task<TEntity> GetByIdWithSpecsAsync(ISpecifications<TEntity> spec)
            => await ApplySpecifications(spec).FirstOrDefaultAsync();
-
 
         public void Update(TEntity entity)
             => _context.Set<TEntity>().Update(entity);
