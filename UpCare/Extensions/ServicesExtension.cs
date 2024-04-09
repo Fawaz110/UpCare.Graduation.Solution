@@ -1,15 +1,22 @@
 ﻿
 using Core.Services.Contract;
+using Core.UnitOfWork.Contract;
 using Microsoft.AspNetCore.Identity;
+using Repository;
 using Service;
+using UpCare.Helpers;
 
 namespace UpCare.Extensions
 {
-    public static class IdentityServicesExtension
+    public static class ServicesExtension
     {
-        public static IServiceCollection AddIdentityServices(this IServiceCollection services)
+        public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddAutoMapper(map => map.AddProfile(new MappingProfiles()));
 
             services.AddScoped(typeof(SignInManager<>));
             services.AddScoped(typeof(UserManager<>));

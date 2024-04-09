@@ -1,8 +1,6 @@
 using Core.Repositories.Contract;
-using Core.Services.Contract;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Repository;
@@ -15,7 +13,6 @@ using Repository.SecondaryData.PatientData;
 using Repository.SecondaryData.PharmacyData;
 using Repository.SecondaryData.ReceptionistData;
 using Repository.UpCareData;
-using Service;
 using UpCare.Errors;
 using UpCare.Extensions;
 
@@ -141,7 +138,7 @@ namespace UpCare
             #endregion
 
             #region ServicesConfigurations
-            builder.Services.AddIdentityServices();
+            builder.Services.AddServices();
 
             builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
 
