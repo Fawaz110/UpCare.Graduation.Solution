@@ -1,4 +1,5 @@
 ﻿
+using Core.Repositories.Contract;
 using Core.Services.Contract;
 using Core.UnitOfWork.Contract;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,12 @@ namespace UpCare.Extensions
         {
             services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
 
+            services.AddScoped<IMedicineRepository, MedicineRepository>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddScoped<IMedicineService, MedicineService>();
+
 
             services.AddAutoMapper(map => map.AddProfile(new MappingProfiles()));
 

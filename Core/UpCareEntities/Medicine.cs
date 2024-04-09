@@ -9,6 +9,7 @@
         public string SideEffects { get; set; }
         public DateTime ProductionDate { get; set; }
         public DateTime ExpiryDate { get; set; }
+        public int Quantity { get; set; }
         public string FK_PharmacyId { get; set; }
     }
 }

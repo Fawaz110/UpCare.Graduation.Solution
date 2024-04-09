@@ -19,6 +19,8 @@ namespace UpCare.DTOs
         [Required]
         public DateTime ExpiryDate { get; set; }
         [Required]
+        public int Quantity { get; set; }
+        [Required]
         public string FK_PharmacyId { get; set; }
     }
 }

@@ -33,7 +33,7 @@ namespace Repository
             return _repositories[key] as IGenericRepository<TEntity>;
         }
 
-        public async Task<int> Complete()
+        public async Task<int> CompleteAsync()
             => await _context.SaveChangesAsync();
 
         public async ValueTask DisposeAsync()

@@ -5,6 +5,6 @@ namespace UpCare.DTOs
     public class SucceededToAdd
     {
         public string Message { get; set; }
-        public BaseEntity Data { get; set; }
+        public object Data { get; set; }
     }
 }

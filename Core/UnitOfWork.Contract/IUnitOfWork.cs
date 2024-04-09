@@ -7,6 +7,6 @@ namespace Core.UnitOfWork.Contract
     {
         IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity;
 
-        Task<int> Complete();
+        Task<int> CompleteAsync();
     }
 }

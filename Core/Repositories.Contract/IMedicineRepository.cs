@@ -9,6 +9,6 @@ namespace Core.Repositories.Contract
 {
     public interface IMedicineRepository : IGenericRepository<Medicine>
     {
-
+        Task<Medicine> GetMedicineByNameAsync(string name);
     }
 }
