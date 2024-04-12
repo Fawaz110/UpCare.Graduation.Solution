@@ -55,5 +55,29 @@ namespace Service
 
         public async Task<Medicine> GetMedicineByName(string name)
             => await _medicineRepository.GetMedicineByNameAsync(name);
+
+        public async Task<List<Medicine>> SearchByMedicineName(string term)
+            => await _medicineRepository.SearchByMedicineName(term);
+
+        public async Task<List<string>> GetCategories()
+            => await _medicineRepository.GetCategories();
+
+        public async Task<List<Medicine>> GetShortage(int leastNormalQuantity)
+            => await _medicineRepository.GetShortage(leastNormalQuantity);
+
+        public void UpdateMedicine(Medicine entity)
+            => _medicineRepository.Update(entity);
+
+        public async Task<int> DeleteAsync(int id)
+        {
+            var medicine = await _unitOfWork.Repository<Medicine>().GetByIdAsync(id);
+
+            if (medicine is not null)
+                _unitOfWork.Repository<Medicine>().Delete(medicine);
+            
+            
+            return await _unitOfWork.CompleteAsync();
+        }
+
     }
 }

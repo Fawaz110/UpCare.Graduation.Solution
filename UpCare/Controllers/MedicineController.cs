@@ -24,14 +24,12 @@ namespace UpCare.Controllers
             //_genericRepository = genericRepository;
         }
         [HttpGet("all")] // GET: /api/medcine/all
-        public async Task<ActionResult<IEnumerable<MedicineDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<Medicine>>> GetAll()
         {
 
             var medicineList = await _medicineService.GetAllAsync();
 
-            var mapped = _mapper.Map<IEnumerable<MedicineDto>>(medicineList);
-
-            return Ok(mapped);
+            return Ok(medicineList);
         }
 
         [HttpGet("{id}")] // GET: /api/medicine/{id}
@@ -63,7 +61,69 @@ namespace UpCare.Controllers
                 Message = "success",
                 Data = await _medicineService.GetMedicineByName(model.Name)
             });
+        }
 
+        [HttpGet("search")] // GET: /api/medicine/search?searchTerm=
+        public async Task<ActionResult<IEnumerable<Medicine>>> Search([FromQuery]string searchTerm)
+        {
+            var medicineList = await _medicineService.SearchByMedicineName(searchTerm);
+
+            if (medicineList.Count() == 0) 
+                return NotFound(new ApiResponse(404, "no medicine matches founded"));
+
+            return Ok(medicineList);
+        }
+
+        [HttpGet("categories")] // GET: /api/medicine/categories
+        public async Task<ActionResult<List<string>>> GetCategories()
+        {
+            var categories = await _medicineService.GetCategories();
+
+            if (categories.Count() == 0)
+                return NotFound(new ApiResponse(404, "no data exists"));
+
+            return Ok(categories);
+        }
+
+        [HttpGet("shortage")] // GET: /api/medicine/shortage
+        public async Task<ActionResult<List<Medicine>>> GetShortage(int leastNormalQuantity = 10)
+        {
+            var medicineList = await _medicineService.GetShortage(leastNormalQuantity);
+
+            if (medicineList.Count == 0) 
+                return NotFound(new ApiResponse(404, "there is no shortage"));
+
+            return Ok(medicineList);
+        }
+
+        [HttpPost("update")] // POST: /api/medicine/update
+        public async Task<ActionResult<SucceededToAdd>> Update([FromBody]Medicine medicine)
+        {
+            try
+            {
+                _medicineService.UpdateMedicine(medicine);
+
+                return Ok(new SucceededToAdd
+                {
+                    Message = "success",
+                    Data = await _medicineService.GetByIdAsync(medicine.Id)
+                });
+
+            }catch(Exception ex)
+            {
+                return BadRequest(new ApiResponse(400, "an error occured during the update of data"));
+            }
+        }
+
+        [HttpDelete("delete")] // DELETE: /api/medicine/delete?id=
+        public async Task<ActionResult<SucceededToAdd>> DeleteMedicine([FromQuery]int id)
+        {
+            var result = await _medicineService.DeleteAsync(id);
+
+            if (result > 0)
+                return Ok(new ApiResponse(200, "medicine deleted successfully"));
+            else
+                return BadRequest(new ApiResponse(400, "there is no medicine matches id"));
         }
 
     }
