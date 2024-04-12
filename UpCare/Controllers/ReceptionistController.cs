@@ -96,5 +96,16 @@ namespace UpCare.Controllers
 
             return Ok(receptionists);
         }
+
+        [HttpGet("all")] // GET: /api/receptionist/all
+        public async Task<ActionResult<IEnumerable<Receptionist>>> GetAll()
+        {
+            var receptionists = await _userManager.Users.ToListAsync();
+
+            if (receptionists.Count() == 0)
+                return NotFound(new ApiResponse(404, "there are no receptionists found"));
+
+            return Ok(receptionists);
+        }
     }
 }

@@ -94,5 +94,16 @@ namespace UpCare.Controllers
 
             return Ok(nurses);
         }
+
+        [HttpGet("all")] // GET: /api/nurse/all
+        public async Task<ActionResult<IEnumerable<Nurse>>> GetAll()
+        {
+            var nurses = await _userManager.Users.ToListAsync();
+
+            if (nurses.Count() == 0)
+                return NotFound(new ApiResponse(404, "there are no nurses found"));
+
+            return Ok(nurses);
+        }
     }
 }

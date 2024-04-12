@@ -90,6 +90,7 @@ namespace UpCare.Controllers
                 UserRole = "doctor"
             });
         }
+
         [HttpGet("search")] // GET: api/doctor/search?nameSearchTerm=string
         public async Task<ActionResult<List<Doctor>>> Search([FromQuery] string nameSearchTerm)
         {
@@ -98,6 +99,17 @@ namespace UpCare.Controllers
                                                    .AsNoTracking().ToListAsync();
             if (doctors.Count() == 0)
                 return BadRequest(new ApiResponse(404, "No doctors matches search term"));
+
+            return Ok(doctors);
+        }
+
+        [HttpGet("all")] // GET: /api/doctor/all
+        public async Task<ActionResult<IEnumerable<Doctor>>> GetAll()
+        {
+            var doctors = await _userManager.Users.ToListAsync();
+
+            if (doctors.Count() == 0)
+                return NotFound(new ApiResponse(404, "there are no doctors found"));
 
             return Ok(doctors);
         }
