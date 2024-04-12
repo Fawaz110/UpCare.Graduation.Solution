@@ -170,6 +170,20 @@ namespace UpCare
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+            {
+                if (env.IsDevelopment())
+                {
+                    app.UseDeveloperExceptionPage();
+                }
+
+                app.UseRouting();
+
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
+            }
 
             app.UseHttpsRedirection();
 
@@ -180,6 +194,7 @@ namespace UpCare
             app.MapControllers();
 
             app.Run();
+
         }
     }
 }

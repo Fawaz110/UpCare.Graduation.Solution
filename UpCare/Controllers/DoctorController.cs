@@ -113,5 +113,16 @@ namespace UpCare.Controllers
 
             return Ok(doctors);
         }
+
+        [HttpGet("specialities")] // GET: /api/doctor/specialities
+        public async Task<ActionResult<List<string>>> GetSpecialities()
+        {
+            var specialities = await _userManager.Users.Select(d => d.Speciality).Where(s => s != "").Distinct().ToListAsync();
+
+            if (specialities.Count() == 0)
+                return NotFound(new ApiResponse(404, "no data founded"));
+
+            return Ok(specialities);
+        }
     }
 }

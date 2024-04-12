@@ -27,6 +27,9 @@ namespace UpCare.Extensions
             services.AddScoped(typeof(SignInManager<>));
             services.AddScoped(typeof(UserManager<>));
             services.AddScoped(typeof(RoleManager<>));
+            services.AddScoped<FireBaseServices>();
+            services.AddControllers();
+
 
             return services;
         }

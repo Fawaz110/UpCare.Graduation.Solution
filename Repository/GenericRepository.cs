@@ -21,6 +21,7 @@ namespace Repository
         public void Delete(TEntity entity)
             => _context.Set<TEntity>().Remove(entity);
         
+        
         public async Task<ICollection<TEntity>> GetAllAsync()
             => await _context.Set<TEntity>().AsNoTracking().ToListAsync();
 
