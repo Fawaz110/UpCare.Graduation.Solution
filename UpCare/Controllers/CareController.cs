@@ -28,5 +28,21 @@ namespace UpCare.Controllers
             }
         }
 
+
+        [HttpGet("GetAllData")] //api.care.getalldata
+        public async Task<IActionResult> GetAllTemperatureAndHumidity()
+        {
+            try
+            {
+                var temperatureAndHumidityData = await _fireBaseServices.GetAllTemperatureAndHumidityAsync();
+          
+                return Ok(temperatureAndHumidityData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }
