@@ -13,14 +13,26 @@ namespace UpCare.Extensions
     {
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
+            #region Repositories Registeration
 
             services.AddScoped<IMedicineRepository, MedicineRepository>();
+            services.AddScoped<ICheckupRepository, CheckupRepository>();
+
+            #endregion
+
+            #region UnitOfWork Registration
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            services.AddScoped<IMedicineService, MedicineService>();
+            #endregion
 
+            #region Services Registrations
+
+            services.AddScoped<IMedicineService, MedicineService>();
+            services.AddScoped<ICheckupService, CheckupService>();
+            services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
+
+            #endregion
 
             services.AddAutoMapper(map => map.AddProfile(new MappingProfiles()));
 
