@@ -84,5 +84,11 @@ namespace UpCare.Controllers
             else
                 return BadRequest(new ApiResponse(400, "there is no checkup matches id"));
         }
+
+        /*
+         * end point we may need it 
+         *      1. get checkup list by patient id (want to look at database 3shan ana me4 fahem 7aga)
+         *      2. get operations on checkup (payment & patient do checkup)
+         */
     }
 }

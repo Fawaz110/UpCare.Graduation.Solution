@@ -65,8 +65,12 @@ namespace Service
         public async Task<List<Medicine>> GetShortage(int leastNormalQuantity)
             => await _medicineRepository.GetShortage(leastNormalQuantity);
 
-        public void UpdateMedicine(Medicine entity)
-            => _medicineRepository.Update(entity);
+        public async void UpdateMedicine(Medicine entity)
+        {
+            _medicineRepository.Update(entity);
+
+            await _unitOfWork.CompleteAsync();
+        }
 
         public async Task<int> DeleteAsync(int id)
         {

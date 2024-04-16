@@ -24,6 +24,8 @@ namespace Service
             {
                 await _checkupRepository.Add(entity);
                 
+                await _unitOfWork.CompleteAsync();
+
                 return entity;
             }
             else
@@ -31,12 +33,11 @@ namespace Service
                 checkup.Price = entity.Price;
 
                 _checkupRepository.Update(checkup);
+
+                await _unitOfWork.CompleteAsync();
+
+                return checkup;
             }
-
-            await _unitOfWork.CompleteAsync();
-
-            return checkup;
-
         }
         
         public async Task<int> DeleteAsync(int id)
