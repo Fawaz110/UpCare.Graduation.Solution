@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Core.UpCareUsers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Service;
 
 namespace UpCare.Controllers
@@ -8,29 +11,16 @@ namespace UpCare.Controllers
     {
         private readonly FireBaseServices _fireBaseServices;
 
-        public CareController(FireBaseServices fireBaseServices )
+        public CareController(FireBaseServices fireBaseServices)
         {
             _fireBaseServices = fireBaseServices;
         }
 
-        [HttpGet("Data")] //api.care.data
-        public async Task<IActionResult> GetData()
-        {
-            try
-            {
-                var (temperature, humidity) = await _fireBaseServices.GetTemperatureAndHumidityAsync();
-                var responseData = new { Temperature = temperature, Humidity = humidity };
-                return Ok(responseData);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+       
 
 
         
-        [HttpGet("GetCurrentTemp")]
+     [HttpGet("GetCurrentTemp")]
         public async Task<IActionResult> GetCurrentTemperature()
         {
             try
@@ -44,7 +34,33 @@ namespace UpCare.Controllers
             }
         }
 
+        [HttpGet("latest")]
+        public async Task<IActionResult> GetLatestData()
+        {
+            try
+            {
+                // Call the DataService to get the latest data
+                var (latestTemperature, latestHumidity, latestTime, latestDate) = await _fireBaseServices.GetLatestData();
 
+                // Construct a JSON response
+                var responseData = new
+                {
+                    Temperature = latestTemperature,
+                    Humidity = latestHumidity,
+                    Time = latestTime,
+                    Date = latestDate
+                };
+
+                // Return the JSON response
+                return Ok(responseData);
+            }
+            catch (Exception ex)
+            {
+                // Log the error and return a 500 Internal Server Error response
+                Console.WriteLine($"Error retrieving latest data: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
 
 
@@ -61,5 +77,11 @@ namespace UpCare.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
+
+       
+
+
     }
 }
