@@ -43,7 +43,7 @@ namespace UpCare.Controllers
                 UserName = user.Name,
                 Email = model.Email,
                 Token = await _authServices.CreateTokenAsync(user, _userManager),
-                UserRole = "doctor"
+                UserRole = "pharmacy"
             });
         }
 

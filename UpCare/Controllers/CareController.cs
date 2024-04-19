@@ -29,14 +29,14 @@ namespace UpCare.Controllers
         }
 
 
-        [HttpGet("GetAllData")] //api.care.getalldata
-        public async Task<IActionResult> GetAllTemperatureAndHumidity()
+        
+        [HttpGet("GetCurrentTemp")]
+        public async Task<IActionResult> GetCurrentTemperature()
         {
             try
             {
-                var temperatureAndHumidityData = await _fireBaseServices.GetAllTemperatureAndHumidityAsync();
-          
-                return Ok(temperatureAndHumidityData);
+                var temperatureData = await _fireBaseServices.GetCurrentTemperatureAsync();
+                return Ok(temperatureData);
             }
             catch (Exception ex)
             {
@@ -44,5 +44,22 @@ namespace UpCare.Controllers
             }
         }
 
+
+
+
+
+        [HttpGet("getCurrentData")]
+        public async Task<IActionResult> GetCurrentData()
+        {
+            try
+            {
+                var currentDataList = await _fireBaseServices.GetCurrentDataAsync();
+                return Ok(currentDataList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
