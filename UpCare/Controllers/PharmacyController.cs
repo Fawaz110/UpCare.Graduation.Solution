@@ -82,5 +82,11 @@ namespace UpCare.Controllers
                 UserRole = "pharmacy"
             });
         }
+
+        /*
+         *      1. GetMedicineForPatient
+         *      2. GetRefill
+         *      
+         */
     }
 }

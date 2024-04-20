@@ -7,19 +7,26 @@ using System.Threading.Tasks;
 using Firebase.Database.Query;
 using Microsoft.Data.SqlClient;
 using Core.UpCareUsers;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Service
 {
     public class FireBaseServices
     {
         private readonly FirebaseClient _firebaseClient;
-        public FireBaseServices()
+        private readonly UserManager<Patient> _userManager;
+
+        public FireBaseServices(
+            UserManager<Patient> userManager
+            )
         {
             _firebaseClient = new FirebaseClient("https://nursecare-4613f-default-rtdb.firebaseio.com/",
                 new FirebaseOptions
                 {
                     AuthTokenAsyncFactory = () => Task.FromResult("YKSySoRUzTn5ih8ZGd4Y1WXgreNEYJpsHZSFu4Zv")
                 });
+            _userManager = userManager;
         }
 
 
@@ -71,6 +78,11 @@ namespace Service
             data.Add("hum", humidityData);
             data.Add("time", timeData);
             data.Add("date", dateData);
+
+            var user = await _userManager.Users.FirstOrDefaultAsync();
+            data.Add("patient", user);
+
+
             currentDataList.Add(data);
             //    }
             //}
@@ -99,7 +111,7 @@ namespace Service
         }
 
 
-        public async Task<(double, double, DateTime, DateTime)> GetLatestData()
+        public async Task<(double, double, DateTime, DateTime, object)> GetLatestData()
         {
             // Retrieve the latest data from each dictionary
             var latestTemperature = await GetLatestEntry("temp");
@@ -107,7 +119,9 @@ namespace Service
             var latestTime = await GetLatestDateTime("time");
             var latestDate = await GetLatestDateTime("date");
 
-            return (latestTemperature, latestHumidity, latestTime, latestDate);
+            var user = await _userManager.Users.FirstOrDefaultAsync();
+
+            return (latestTemperature, latestHumidity, latestTime, latestDate, user);
         }
 
         private async Task<double> GetLatestEntry(string nodeName)

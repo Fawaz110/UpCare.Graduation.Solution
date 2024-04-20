@@ -1,6 +1,9 @@
-﻿namespace UpCare.Hubs
+﻿using Microsoft.AspNetCore.SignalR;
+
+namespace UpCare.Hubs
 {
-    public class ChatHub
+    public class ChatHub : Hub
     {
+
     }
 }

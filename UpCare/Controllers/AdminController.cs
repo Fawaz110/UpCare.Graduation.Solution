@@ -46,5 +46,10 @@ namespace UpCare.Controllers
                 UserRole = "admin"
             });
         }
+
+        /*
+         *      1. Operation (Add, Update, Delete)
+         *      2. Add Operation To Doctor And Patient (DoctorDoOperation)
+         */
     }
 }

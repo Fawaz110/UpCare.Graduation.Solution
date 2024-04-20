@@ -129,5 +129,11 @@ namespace UpCare.Controllers
             return Ok(patients);
         }
 
+        /*
+         *      1. Consultation (add, cancel)
+         *      2. Appointment
+         *      3. Medicine Refill
+         *      4. CollectPatientHistory
+         */
     }
 }

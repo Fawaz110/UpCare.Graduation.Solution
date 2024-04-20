@@ -107,5 +107,10 @@ namespace UpCare.Controllers
 
             return Ok(receptionists);
         }
+
+        /*
+         *      1. Rooms
+         *      2. RoomsForPatients
+         */
     }
 }

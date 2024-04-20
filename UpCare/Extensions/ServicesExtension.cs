@@ -44,6 +44,8 @@ namespace UpCare.Extensions
             services.AddScoped<FireBaseServices>();
             services.AddControllers();
 
+            services.AddSignalR();
+
 
             return services;
         }
