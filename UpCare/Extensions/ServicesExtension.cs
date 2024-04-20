@@ -18,6 +18,8 @@ namespace UpCare.Extensions
             services.AddScoped<IMedicineRepository, MedicineRepository>();
             services.AddScoped<ICheckupRepository, CheckupRepository>();
             services.AddScoped<IRadiologyRepository, RadiologyRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+            services.AddScoped<IConsultationRepository, ConsultationRepository>();
 
             #endregion
 
@@ -32,6 +34,7 @@ namespace UpCare.Extensions
             services.AddScoped<IMedicineService, MedicineService>();
             services.AddScoped<ICheckupService, CheckupService>();
             services.AddScoped<IRadiologyService, RadiologyService>();
+            services.AddScoped<IConsultationService, ConsultationService>();
             services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
 
             #endregion

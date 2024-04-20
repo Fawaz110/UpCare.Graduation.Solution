@@ -1,5 +1,7 @@
 ﻿using Core.Repositories.Contract;
 using Core.Services.Contract;
+using Core.UnitOfWork.Contract;
+using Core.UpCareEntities;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,15 +18,18 @@ namespace UpCare.Controllers
         private readonly UserManager<Patient> _userManager;
         private readonly IAuthServices _authServices;
         private readonly SignInManager<Patient> _signInManager;
+        private readonly IUnitOfWork _unitOfWork;
 
         public PatientController(
             UserManager<Patient> userManager,
             IAuthServices authServices,
-            SignInManager<Patient> signInManager)
+            SignInManager<Patient> signInManager,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _authServices = authServices;
             _signInManager = signInManager;
+            _unitOfWork = unitOfWork;
         }
         [HttpPost("login")] // POST: /api/patient/login
         public async Task<ActionResult<UserDto>> Login(LoginDto model)
@@ -129,11 +134,5 @@ namespace UpCare.Controllers
             return Ok(patients);
         }
 
-        /*
-         *      1. Consultation (add, cancel)
-         *      2. Appointment
-         *      3. Medicine Refill
-         *      4. CollectPatientHistory
-         */
     }
 }
