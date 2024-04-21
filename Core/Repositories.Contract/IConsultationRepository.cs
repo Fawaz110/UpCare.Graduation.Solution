@@ -10,5 +10,6 @@ namespace Core.Repositories.Contract
         Task<PatientConsultation> GetNextConsultationAsync(string patientId, string doctorId);
         Task AddConsultationAsync(PatientConsultation patientConsultation);
         void DeleteAsync(PatientConsultation patientConsultation);
+        Task<PatientConsultation> GetWithSpec(PatientConsultation consultation);
     }
 }

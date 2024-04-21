@@ -34,5 +34,10 @@ namespace Repository
             => await _context.Set<PatientConsultation>().FirstOrDefaultAsync(pc => pc.FK_PatientId == patientId
                                                                                 && pc.FK_DoctorId == doctorId
                                                                                 && pc.DateTime > DateTime.UtcNow);
+
+        public async Task<PatientConsultation> GetWithSpec(PatientConsultation consultation)
+            => await _context.Set<PatientConsultation>().FirstOrDefaultAsync(x => x.FK_PatientId == consultation.FK_PatientId
+                                                                               && x.FK_DoctorId == consultation.FK_DoctorId
+                                                                               && x.DateTime == consultation.DateTime);
     }
 }

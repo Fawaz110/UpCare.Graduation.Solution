@@ -1,4 +1,5 @@
 ﻿using Core.UpCareEntities;
+using Core.UpCareUsers;
 
 namespace Core.Services.Contract
 {
@@ -10,5 +11,6 @@ namespace Core.Services.Contract
         Task<PatientConsultation> GetNextConsultationAsync(string patientId, string doctorId);
         Task<PatientConsultation> AddConsultationAsync(PatientConsultation patientConsultation);
         Task<int> DeleteAsync(PatientConsultation patientConsultation);
+        Task<Doctor> GetFirstAvailableDoctorBySpeciality(string speciality);
     }
 }
