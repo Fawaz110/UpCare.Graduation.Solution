@@ -240,7 +240,17 @@ namespace UpCare.Controllers
             if (added is null)
                 return BadRequest(new ApiResponse(400, "an error occured during adding data"));
 
-            return Ok(added);
+            return Ok(new SucceededToAdd
+            {
+                Message = "success",
+                Data = new ConsultationDto
+                {
+                    Doctor = await _doctorManager.FindByIdAsync(added.FK_DoctorId),
+                    Patient = await _patientManager.FindByIdAsync(added.FK_PatientId),
+                    DateTime = added.DateTime,
+                    Type = added.Type
+                }
+            }) ;
         }
 
         [HttpDelete("cancel")] // DELETE: /api/consultation/cancel

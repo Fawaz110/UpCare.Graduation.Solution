@@ -37,9 +37,6 @@ namespace Service
             if (patient is null || doctor is null) 
                 return null;
 
-            if (patientConsultation.DateTime < DateTime.UtcNow) 
-                return null;
-
             if (!(await ConsultationTimeIsAvailable(patientConsultation)))
                 return null;
 
@@ -81,11 +78,6 @@ namespace Service
             return consultations;
         }
 
-        public Task<List<PatientConsultation>> GetConsultationBetweenPatientAndDoctorAsync(string patientId, string doctorId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<Doctor> GetFirstAvailableDoctorBySpeciality(string speciality)
         {
             var specialities = _doctorManager.Users.Select(x=>x.Speciality).Distinct().ToList();
@@ -119,6 +111,10 @@ namespace Service
             return result;
         }
 
+        public Task<List<PatientConsultation>> GetConsultationBetweenPatientAndDoctorAsync(string patientId, string doctorId)
+        {
+            throw new NotImplementedException();
+        }
 
 
         // method to check booking is available or not
@@ -128,14 +124,14 @@ namespace Service
 
             var appointments = await _appointmentRepository.GetByDoctorIdAsync(consultation.FK_DoctorId);
 
-            foreach (var con in consultations.Where(x => x.DateTime > DateTime.UtcNow))
+            foreach (var con in consultations)
             {
                 TimeSpan diff = consultation.DateTime - con.DateTime;
                 if (diff.Duration() < TimeSpan.FromMinutes(30))
                     return false;
             }
 
-            foreach (var con in appointments.Where(x => x.DateTime > DateTime.UtcNow))
+            foreach (var con in appointments)
             {
                 TimeSpan diff = consultation.DateTime - con.DateTime;
                 if (diff.Duration() < TimeSpan.FromMinutes(30))
@@ -150,14 +146,14 @@ namespace Service
 
             var appointments = await _appointmentRepository.GetByDoctorIdAsync(doctor.Id);
 
-            foreach (var con in consultations.Where(x => x.DateTime > DateTime.UtcNow))
+            foreach (var con in consultations)
             {
                 TimeSpan diff = DateTime.UtcNow - con.DateTime;
                 if (diff.Duration() < TimeSpan.FromMinutes(30))
                     return false;
             }
 
-            foreach (var con in appointments.Where(x => x.DateTime > DateTime.UtcNow))
+            foreach (var con in appointments)
             {
                 TimeSpan diff = DateTime.UtcNow - con.DateTime;
                 if (diff.Duration() < TimeSpan.FromMinutes(30))
