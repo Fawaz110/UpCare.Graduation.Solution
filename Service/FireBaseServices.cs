@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Firebase.Database.Query;
 using Microsoft.Data.SqlClient;
 using Core.UpCareUsers;
-using System.Net.Mail;
-using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,17 +15,17 @@ namespace Service
     public class FireBaseServices
     {
         private readonly FirebaseClient _firebaseClient;
-        private readonly string _recipientEmailAddress;
         private readonly UserManager<Patient> _userManager;
 
-        public FireBaseServices(UserManager<Patient> userManager)
+        public FireBaseServices(
+            UserManager<Patient> userManager
+            )
         {
             _firebaseClient = new FirebaseClient("https://nursecare-4613f-default-rtdb.firebaseio.com/",
                 new FirebaseOptions
                 {
                     AuthTokenAsyncFactory = () => Task.FromResult("YKSySoRUzTn5ih8ZGd4Y1WXgreNEYJpsHZSFu4Zv")
                 });
-            _recipientEmailAddress="mariam.sameh.duk@gmail.com";
             _userManager = userManager;
         }
 
@@ -113,7 +111,7 @@ namespace Service
         }
 
 
-        public async Task<(double, double, string, string,Patient)> GetLatestData()
+        public async Task<(double, double, DateTime, DateTime, object)> GetLatestData()
         {
             // Retrieve the latest data from each dictionary
             var latestTemperature = await GetLatestEntry("temp");
@@ -126,19 +124,20 @@ namespace Service
             return (latestTemperature, latestHumidity, latestTime, latestDate, user);
         }
 
-        private async Task<float> GetLatestEntry(string nodeName)
+        private async Task<double> GetLatestEntry(string nodeName)
         {
             try
             {
                 // Query Firebase database for the specified node
-                var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<float>();
+                var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<double>();
 
                 // Find the latest entry
-                var latestEntry = firebaseData.LastOrDefault();
+                var latestEntry = firebaseData.OrderByDescending(x => DateTime.Parse(x.Key)).FirstOrDefault();
 
                 if (latestEntry != null)
+                {
                     return latestEntry.Object;
-                
+                }
             }
             catch (Exception ex)
             {
@@ -150,15 +149,15 @@ namespace Service
             return default;
         }
 
-        private async Task<string> GetLatestDateTime(string nodeName)
+        private async Task<DateTime> GetLatestDateTime(string nodeName)
         {
             try
             {
                 // Query Firebase database for the specified node
-                var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<string>();
+                var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<DateTime>();
 
                 // Find the latest entry
-                var latestEntry = firebaseData.LastOrDefault();
+                var latestEntry = firebaseData.OrderByDescending(x => x.Object).FirstOrDefault();
 
                 if (latestEntry != null)
                 {
@@ -174,72 +173,14 @@ namespace Service
             // Return default value if no data found or error occurred
             return default;
         }
-        public async Task MonitorTemperature()
-        {
-            // var latestTemperature = await GetLatestEntry("temp");
-            // Continuously monitor temperature data
-            while (true)
-            {
-                try
-                {
-                    // Retrieve the latest temperature value from Firebase
-                    var latestTemperature = await GetLatestEntry("temp");
 
-                    // Check if the temperature equals 25
-                    if (latestTemperature < 100)
-                    {
-                        // Send a notification message
-                        SendEmailNotification("Temperature reached 25 degrees Celsius!");
 
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Handle error
-                    Console.WriteLine($"Error monitoring temperature: {ex.Message}");
-                }
-
-                // Wait for a specified interval before checking again
-                await Task.Delay(TimeSpan.FromMinutes(1));
-            }
-        }
-
-        
-        private void SendEmailNotification(string message)
-        {
-            try
-            {
-                // Create and configure the SMTP client
-                using (var smtpClient = new SmtpClient("bulk.smtp.mailtrap.io", 587))
-                {
-                    smtpClient.EnableSsl = true;
-                    smtpClient.UseDefaultCredentials = false;
-                    smtpClient.Credentials = new NetworkCredential("api", "be03d5972bfd0863bcc85baab6b81934");
-
-                    // Create and send the email message
-                    var mailMessage = new MailMessage("mailtrap@demomailtrap.com", _recipientEmailAddress)
-                    {
-                        Subject = "Temperature Notification",
-                        Body = message
-                    };
-
-                    smtpClient.Send(mailMessage);
-                    Console.WriteLine("Email notification sent successfully.");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle error
-                Console.WriteLine($"Error sending email notification: {ex.Message}");
-            }
-        }
 
     }
 }
-        
 
 
 
-    
+
+
 
