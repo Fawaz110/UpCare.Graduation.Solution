@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Service;
+using UpCare.Errors;
 
 namespace UpCare.Controllers
 {
@@ -84,7 +85,23 @@ namespace UpCare.Controllers
 
 
 
-       
+        [HttpGet("monitor")]
+        public async Task<ActionResult<string>> StartTemperatureMonitoring()
+        {
+            try
+            {
+                // Start monitoring the temperature
+                await _fireBaseServices.MonitorTemperature();
+
+                return Ok(new ApiResponse(200, "email sent successfully"));
+            }
+            catch (Exception ex)
+            {
+                // Log the error and return a 500 Internal Server Error response
+                Console.WriteLine($"Error starting temperature monitoring: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
 
     }
