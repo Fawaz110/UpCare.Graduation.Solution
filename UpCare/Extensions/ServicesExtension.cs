@@ -35,6 +35,7 @@ namespace UpCare.Extensions
             services.AddScoped<ICheckupService, CheckupService>();
             services.AddScoped<IRadiologyService, RadiologyService>();
             services.AddScoped<IConsultationService, ConsultationService>();
+            services.AddScoped<IAppointmentService, AppointmentService>();
             services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
 
             #endregion

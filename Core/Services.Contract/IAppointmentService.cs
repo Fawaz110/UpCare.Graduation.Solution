@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Core.UpCareEntities;
 
 namespace Core.Services.Contract
 {
-    internal interface IAppointmentService
+    public interface IAppointmentService
     {
+        Task<PatientAppointment> AddAppointmentAsync(PatientAppointment appointment);
+        Task<int> DeleteAsync(PatientAppointment appointment);
+        Task<List<PatientAppointment>> GetAllByDoctorIdAsync(string Id);
+        Task<List<PatientAppointment>> GetAllByPatientIdAsync(string Id);
     }
 }

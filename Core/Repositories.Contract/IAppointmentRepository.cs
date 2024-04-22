@@ -8,7 +8,8 @@ namespace Core.Repositories.Contract
         Task<List<PatientAppointment>> GetByDoctorIdAsync(string doctorId);
         Task<List<PatientAppointment>> GetAppointmentsBetweenPatientAndDoctorAsync(string patientId, string doctorId);
         Task<PatientAppointment> GetNextAppointmentAsync(string patientId, string doctorId);
-        Task AddConsultationAsync(PatientAppointment patientConsultation);
-        void DeleteAsync(PatientAppointment patientConsultation);
+        Task AddAppointmentAsync(PatientAppointment patientConsultation);
+        Task<PatientAppointment> GetWithSpec(PatientAppointment appointment);
+        void DeleteAsync(PatientAppointment patientAppointment);
     }
 }

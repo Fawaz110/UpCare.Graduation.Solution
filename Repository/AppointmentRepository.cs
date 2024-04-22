@@ -19,7 +19,7 @@ namespace Repository
         {
             _context = context;
         }
-        public async Task AddConsultationAsync(PatientAppointment patientAppointment)
+        public async Task AddAppointmentAsync(PatientAppointment patientAppointment)
             => await _context.Set<PatientAppointment>().AddAsync(patientAppointment);
 
         public void DeleteAsync(PatientAppointment patientAppointment)
@@ -40,5 +40,9 @@ namespace Repository
                                                                                 && pc.FK_DoctorId == doctorId
                                                                                 && pc.DateTime > DateTime.UtcNow);
 
+        public async Task<PatientAppointment> GetWithSpec(PatientAppointment appointment)
+            => await _context.Set<PatientAppointment>().FirstOrDefaultAsync(x => x.FK_PatientId == appointment.FK_PatientId
+                                                                               && x.FK_DoctorId == appointment.FK_DoctorId
+                                                                               && x.DateTime == appointment.DateTime);
     }
 }
