@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Service;
 using UpCare.Errors;
 
@@ -11,10 +12,11 @@ namespace UpCare.Controllers
     public class CareController : BaseApiController
     {
         private readonly FireBaseServices _fireBaseServices;
-
-        public CareController(FireBaseServices fireBaseServices)
+        public CareController(
+            FireBaseServices fireBaseServices)
         {
             _fireBaseServices = fireBaseServices;
+
         }
 
        
@@ -27,6 +29,7 @@ namespace UpCare.Controllers
             try
             {
                 var temperatureData = await _fireBaseServices.GetCurrentTemperatureAsync();
+
                 return Ok(temperatureData);
             }
             catch (Exception ex)
@@ -41,7 +44,7 @@ namespace UpCare.Controllers
             try
             {
                 // Call the DataService to get the latest data
-                var (latestTemperature, latestHumidity, latestTime, latestDate) = await _fireBaseServices.GetLatestData();
+                var (latestTemperature, latestHumidity, latestTime, latestDate, patient) = await _fireBaseServices.GetLatestData();
 
                 // Construct a JSON response
                 var responseData = new
@@ -49,7 +52,8 @@ namespace UpCare.Controllers
                     Temperature = latestTemperature,
                     Humidity = latestHumidity,
                     Time = latestTime,
-                    Date = latestDate
+                    Date = latestDate,
+                    Patient = patient
                 };
 
                 // Return the JSON response

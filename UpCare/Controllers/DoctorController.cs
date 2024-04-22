@@ -124,5 +124,9 @@ namespace UpCare.Controllers
 
             return Ok(specialities);
         }
+
+        /*
+         *      1. Prescription (CRUDS)
+         */
     }
 }

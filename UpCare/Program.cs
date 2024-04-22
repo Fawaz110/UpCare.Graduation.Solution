@@ -15,6 +15,7 @@ using Repository.SecondaryData.ReceptionistData;
 using Repository.UpCareData;
 using UpCare.Errors;
 using UpCare.Extensions;
+using UpCare.Hubs;
 
 namespace UpCare
 {
@@ -162,6 +163,8 @@ namespace UpCare
 
             var app = builder.Build();
 
+
+
             await app.Services.ApplyMigrateAsync();
 
             // Configure the HTTP request pipeline.
@@ -172,6 +175,7 @@ namespace UpCare
             }
             void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             {
+
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
