@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.UpCareData;
 
@@ -11,9 +12,10 @@ using Repository.UpCareData;
 namespace Repository.UpCareData.Migrations
 {
     [DbContext(typeof(UpCareDbContext))]
-    partial class UpCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240422232902_AddAvailableBedsColumnInRoomsTable")]
+    partial class AddAvailableBedsColumnInRoomsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,6 +108,9 @@ namespace Repository.UpCareData.Migrations
                     b.Property<string>("FK_ReceptionistId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
 
                     b.Property<int>("NumberOfBeds")
                         .HasColumnType("int");
@@ -363,9 +368,6 @@ namespace Repository.UpCareData.Migrations
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("NumberOfRecievedBeds")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
