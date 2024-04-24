@@ -71,5 +71,35 @@ namespace Service
 
         public async Task<List<PatientBookRoom>> GetAllPatientBookingAsync()
             => await _patientRoomRepository.GetAllPatientRoomsAsync();
+
+        public async Task<PatientBookRoom> EndPatientRoomBooking(PatientBookRoom patientBookRoom)
+        {
+            var room = await _unitOfWork.Repository<Room>().GetByIdAsync(patientBookRoom.FK_RoomId);
+
+            room.AvailableBeds += patientBookRoom.NumberOfRecievedBeds;
+
+            _unitOfWork.Repository<Room>().Update(room);
+
+            var result = await _unitOfWork.CompleteAsync();
+
+            if (result <= 0) 
+                return null;
+
+            var record = await _patientRoomRepository.GetSpecificRecord(patientBookRoom);
+
+            if (record is null) 
+                return null;
+
+            record.EndDate = DateTime.Now;
+
+            _patientRoomRepository.UpdatePatintBookRoom(record);
+
+            result = await _unitOfWork.CompleteAsync();
+
+            if (result <= 0) 
+                return null;
+
+            return record;
+        }
     }
 }

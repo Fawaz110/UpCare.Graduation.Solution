@@ -7,7 +7,7 @@ namespace Core.Services.Contract
     {
         Task<Room> AddRoomAsync(Room room);
         Task<PatientBookRoom> BookRoomAsync(PatientBookRoom patientBookRoom);
-
         Task<List<PatientBookRoom>> GetAllPatientBookingAsync();
+        Task<PatientBookRoom> EndPatientRoomBooking(PatientBookRoom patientBookRoom);
     }
 }

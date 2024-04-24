@@ -56,13 +56,7 @@ namespace UpCare.Controllers
 
                 var patientsIds = list.Where(x=>x.FK_RoomId == id).Select(x=>x.FK_PatientId).ToList();
 
-                List<Patient> pp = new List<Patient>();
-
-                foreach (var patientId in patientsIds)
-                {
-                    var patient = await _patientManager.FindByIdAsync(patientId);                 
-                    pp.Add(patient);
-                }
+                var pp = await GetPatientsInRoom(room.Id);
 
                 var item = new RoomDto
                 {
@@ -94,11 +88,7 @@ namespace UpCare.Controllers
 
             var patintsIds = booking.Where(x => x.FK_RoomId == id).Select(x => x.FK_PatientId).Distinct().ToList();
 
-            List<Patient> patients = new List<Patient>();
-
-            foreach (var patientId in patintsIds)
-                patients.Add(await _patientManager.FindByIdAsync(patientId));
-
+            var patients = await GetPatientsInRoom(room.Id);
 
             var roomToReturn = new RoomDto
             {
@@ -160,21 +150,9 @@ namespace UpCare.Controllers
             if (result is null) 
                 return BadRequest(new ApiResponse(400, "an error occured while adding data"));
 
-            
-            List<Patient> patients = new List<Patient> { patient };
 
-            var allRecords = await _roomService.GetAllPatientBookingAsync();
+            var patients = await GetPatientsInRoom(room.Id);
 
-            var patientsIds = allRecords.Select(x => x.FK_PatientId).Distinct().ToList();
-
-            foreach (var id in patientsIds)
-            {
-                var pt = await _patientManager.FindByIdAsync(id);
-
-                if (!patients.Contains(pt))
-                    patients.Add(pt);
-            }
-            
             return Ok(new SucceededToAdd
             {
                 Message = "success",
@@ -190,6 +168,63 @@ namespace UpCare.Controllers
             });
         }
 
-        
+        [HttpPost("end/booking")] // POST: /api/room/end/booking
+        public async Task<ActionResult<SucceededToAdd>> EndBooking([FromBody] PatientBookRoom model)
+        {
+            var patient = await _patientManager.FindByIdAsync(model.FK_PatientId);
+
+            if (patient is null)
+                return NotFound(new ApiResponse(404, "no data matches found"));
+
+            var doctor = await _doctorManager.FindByIdAsync(model.FK_DoctorId);
+
+            if (doctor is null)
+                return NotFound(new ApiResponse(404, "no data matches found"));
+
+            var room = await _unitOfWork.Repository<Room>().GetByIdAsync(model.FK_RoomId);
+
+            if (room is null) 
+                return NotFound(new ApiResponse(404, "no data matches found"));
+
+            var result = await _roomService.EndPatientRoomBooking(model);
+
+            if (result is null)
+                return BadRequest(new ApiResponse(400, "an error occured during update data"));
+
+            var objectToReturn = new RoomDto
+            {
+                AvailableBedsNumber = room.AvailableBeds,
+                Id = room.Id,
+                NumberOfBeds = room.NumberOfBeds,
+                PricePerNight = room.PricePerNight,
+                Receptionist = await _receptionistManager.FindByIdAsync(room.FK_ReceptionistId),
+                Patients = await GetPatientsInRoom(room.Id)
+            };
+
+            return Ok(new SucceededToAdd
+            {
+                Message = "success",
+                Data = objectToReturn
+            });
+        }
+
+        private async Task<List<Patient>> GetPatientsInRoom(int roomId)
+        {
+            List<Patient> patients = new List<Patient>();
+
+            var allRecords = await _roomService.GetAllPatientBookingAsync();
+
+            var patientsIds = allRecords.Where(x => x.EndDate != DateTime.MinValue).Select(x => x.FK_PatientId).Distinct().ToList();
+
+            foreach (var id in patientsIds)
+            {
+                var pt = await _patientManager.FindByIdAsync(id);
+
+                if (!patients.Contains(pt))
+                    patients.Add(pt);
+            }
+
+            return patients;
+        }
     }
 }

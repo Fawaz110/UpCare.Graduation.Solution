@@ -20,5 +20,13 @@ namespace Repository
 
         public async Task<List<PatientBookRoom>> GetAllPatientRoomsAsync()
             => await _context.Set<PatientBookRoom>().ToListAsync();
+
+        public void UpdatePatintBookRoom(PatientBookRoom data)
+            => _context.Set<PatientBookRoom>().Update(data);
+
+        public async Task<PatientBookRoom> GetSpecificRecord(PatientBookRoom data)
+            => await _context.Set<PatientBookRoom>().Where(x => x.FK_DoctorId == data.FK_DoctorId
+                                                             && x.FK_PatientId == data.FK_PatientId
+                                                             && x.StartDate == data.StartDate).FirstOrDefaultAsync();
     }
 }
