@@ -34,6 +34,8 @@ namespace Service
 
         public async Task<Room> AddRoomAsync(Room room)
         {
+            room.AvailableBeds = room.NumberOfBeds;
+
             await _unitOfWork.Repository<Room>().Add(room);
 
             var result = await _unitOfWork.CompleteAsync();

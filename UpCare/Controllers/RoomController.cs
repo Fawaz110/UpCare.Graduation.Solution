@@ -39,33 +39,23 @@ namespace UpCare.Controllers
         [HttpGet("all")] // GET: /api/room/all
         public async Task<ActionResult<List<RoomDto>>> GetAll()
         {
+            var rooms = await _unitOfWork.Repository<Room>().GetAllAsync();
+
+            if (rooms.Count == 0) 
+                return NotFound(new ApiResponse(404, "no data found"));
+            
             var listToReturn = new List<RoomDto>();
 
-            var list = await _roomService.GetAllPatientBookingAsync();
-
-            if (list.Count() == 0)
-                return NotFound(new ApiResponse(404, "no data found"));
-
-            var roomsIds = list.Select(x => x.FK_RoomId).Distinct().ToList();
-
-            foreach (var id in roomsIds)
+            foreach (var room in rooms)
             {
-                var room = await _unitOfWork.Repository<Room>().GetByIdAsync(id);
-
-                var reception = await _receptionistManager.FindByIdAsync(room.FK_ReceptionistId);
-
-                var patientsIds = list.Where(x=>x.FK_RoomId == id).Select(x=>x.FK_PatientId).ToList();
-
-                var pp = await GetPatientsInRoom(room.Id);
-
                 var item = new RoomDto
                 {
                     Id = room.Id,
-                    PricePerNight = room.PricePerNight,
-                    NumberOfBeds = room.NumberOfBeds,
                     AvailableBedsNumber = room.AvailableBeds,
-                    Receptionist = reception,
-                    Patients = pp
+                    NumberOfBeds = room.NumberOfBeds,
+                    PricePerNight = room.PricePerNight,
+                    Receptionist = await _receptionistManager.FindByIdAsync(room.FK_ReceptionistId),
+                    Patients = await GetPatientsInRoom(room.Id)
                 };
 
                 listToReturn.Add(item);
@@ -75,7 +65,7 @@ namespace UpCare.Controllers
             
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}")] // GET: /api/room/{id}
         public async Task<ActionResult<RoomDto>> GetById(int id)
         {
             var room = await _unitOfWork.Repository<Room>().GetByIdAsync(id);
@@ -208,13 +198,63 @@ namespace UpCare.Controllers
             });
         }
 
+        [HttpPost("update")] // POST: /api/room/update
+        public async Task<ActionResult<SucceededToAdd>> UpdateRoom([FromBody]Room model)
+        {
+            var room = await _unitOfWork.Repository<Room>().GetByIdAsync(model.Id);
+
+
+            if (room is null)
+                return NotFound(new ApiResponse(404, "no data matches found"));
+
+            if ((model.NumberOfBeds - room.NumberOfBeds) < 0)
+                return BadRequest(new ApiResponse(400, "can't set that number of bed right now"));
+
+            room.PricePerNight = model.PricePerNight;
+            room.AvailableBeds += (model.NumberOfBeds - room.NumberOfBeds);
+            room.NumberOfBeds = model.NumberOfBeds;
+
+            _unitOfWork.Repository<Room>().Update(room);
+
+            var result = await _unitOfWork.CompleteAsync();
+
+            if (result <= 0)
+                return BadRequest(new ApiResponse(400, "bad request"));
+
+            return Ok(new RoomDto
+            {
+                Id = room.Id,
+                AvailableBedsNumber = room.AvailableBeds,
+                NumberOfBeds = room.NumberOfBeds,
+                PricePerNight = room.PricePerNight,
+                Receptionist = await _receptionistManager.FindByIdAsync(room.FK_ReceptionistId),
+                Patients = await GetPatientsInRoom(room.Id)
+            });
+        }
+
+        [HttpDelete("delete/{id}")] // DELETE: /api/room/delete
+        public async Task<ActionResult<SucceededToAdd>> DeleteRoom(int id)
+        {
+            var room = await _unitOfWork.Repository<Room>().GetByIdAsync(id);
+
+            if (room is null) 
+                return NotFound(new ApiResponse(404, "no data matches found"));
+
+            _unitOfWork.Repository<Room>().Delete(room);
+            
+            await _unitOfWork.CompleteAsync();
+
+            return Ok(new ApiResponse(200, "room deleted successfully"));
+        }
+
+        // Method to get patients in specific room that no ended there booking
         private async Task<List<Patient>> GetPatientsInRoom(int roomId)
         {
             List<Patient> patients = new List<Patient>();
 
             var allRecords = await _roomService.GetAllPatientBookingAsync();
 
-            var patientsIds = allRecords.Where(x => x.EndDate != DateTime.MinValue).Select(x => x.FK_PatientId).Distinct().ToList();
+            var patientsIds = allRecords.Where(x => x.EndDate != DateTime.MinValue && x.FK_RoomId == roomId).Select(x => x.FK_PatientId).Distinct().ToList();
 
             foreach (var id in patientsIds)
             {
