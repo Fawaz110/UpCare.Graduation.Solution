@@ -14,19 +14,22 @@ namespace Repository
         private readonly IConsultationRepository _consultationRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IOperationRepository _operationRepository;
 
         public AppointmentService(
             UserManager<Patient> patientManager,
             UserManager<Doctor> doctorManager,
             IConsultationRepository consultationRepository,
             IUnitOfWork unitOfWork,
-            IAppointmentRepository appointmentRepository)
+            IAppointmentRepository appointmentRepository,
+            IOperationRepository operationRepository)
         {
             this._patientManager = patientManager;
             this._doctorManager = doctorManager;
             _consultationRepository = consultationRepository;
             _unitOfWork = unitOfWork;
             _appointmentRepository = appointmentRepository;
+            _operationRepository = operationRepository;
         }
 
         public async Task<PatientAppointment> AddAppointmentAsync(PatientAppointment appointment)
@@ -89,6 +92,8 @@ namespace Repository
 
             var appointments = await _appointmentRepository.GetByDoctorIdAsync(appointment.FK_DoctorId);
 
+            var ops = await _operationRepository.GetScheduledOperationsAsync();
+
             foreach (var con in consultations)
             {
                 TimeSpan diff = appointment.DateTime - con.DateTime;
@@ -99,6 +104,13 @@ namespace Repository
             foreach (var con in appointments)
             {
                 TimeSpan diff = appointment.DateTime - con.DateTime;
+                if (diff.Duration() < TimeSpan.FromMinutes(30))
+                    return false;
+            }
+
+            foreach (var op in ops)
+            {
+                TimeSpan diff = appointment.DateTime - op.Date;
                 if (diff.Duration() < TimeSpan.FromMinutes(30))
                     return false;
             }

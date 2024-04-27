@@ -46,9 +46,11 @@ namespace UpCare.Controllers
                     Patient = await _patientManager.FindByIdAsync(item.FK_PatientId)                    
                 };
                 if (!string.IsNullOrEmpty(patientNameSearchTerm))
+                {
                     if ((feedback.Patient.FirstName.Trim().ToLower().Contains(patientNameSearchTerm.Trim().ToLower())
                         | feedback.Patient.LastName.Trim().ToLower().Contains(patientNameSearchTerm.Trim().ToLower())))
                         result.Add(feedback);
+                }
                 else
                     result.Add(feedback);                
             }

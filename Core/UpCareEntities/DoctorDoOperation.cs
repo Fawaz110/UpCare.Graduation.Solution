@@ -11,6 +11,7 @@ namespace Core.UpCareEntities
         public int FK_OperationId { get; set; }
         public string FK_DoctorId { get; set; }
         public string FK_PatientId { get; set; }
+        public string FK_AdminId { get; set; }
         public DateTime Date { get; set; }
     }
 }

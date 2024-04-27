@@ -13,6 +13,7 @@ namespace Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConsultationRepository _consultationRepository;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IOperationRepository _operationRepository;
         private readonly UserManager<Patient> _patientManager;
         private readonly UserManager<Doctor> _doctorManager;
 
@@ -20,12 +21,14 @@ namespace Service
             IUnitOfWork unitOfWork,
             IConsultationRepository consultationRepository,
             IAppointmentRepository appointmentRepository,
+            IOperationRepository operationRepository,
             UserManager<Patient> patientManager,
             UserManager<Doctor> doctorManager)
         {
             _unitOfWork = unitOfWork;
             _consultationRepository = consultationRepository;
             _appointmentRepository = appointmentRepository;
+            _operationRepository = operationRepository;
             _patientManager = patientManager;
             _doctorManager = doctorManager;
         }
@@ -124,6 +127,8 @@ namespace Service
 
             var appointments = await _appointmentRepository.GetByDoctorIdAsync(consultation.FK_DoctorId);
 
+            var ops = await _operationRepository.GetScheduledOperationsAsync();
+
             foreach (var con in consultations)
             {
                 TimeSpan diff = consultation.DateTime - con.DateTime;
@@ -134,6 +139,13 @@ namespace Service
             foreach (var con in appointments)
             {
                 TimeSpan diff = consultation.DateTime - con.DateTime;
+                if (diff.Duration() < TimeSpan.FromMinutes(30))
+                    return false;
+            }
+
+            foreach (var op in ops)
+            {
+                TimeSpan diff = consultation.DateTime - op.Date;
                 if (diff.Duration() < TimeSpan.FromMinutes(30))
                     return false;
             }
@@ -146,6 +158,8 @@ namespace Service
 
             var appointments = await _appointmentRepository.GetByDoctorIdAsync(doctor.Id);
 
+            var ops = await _operationRepository.GetScheduledOperationsAsync();
+
             foreach (var con in consultations)
             {
                 TimeSpan diff = DateTime.UtcNow - con.DateTime;
@@ -156,6 +170,14 @@ namespace Service
             foreach (var con in appointments)
             {
                 TimeSpan diff = DateTime.UtcNow - con.DateTime;
+                if (diff.Duration() < TimeSpan.FromMinutes(30))
+                    return false;
+            }
+            
+
+            foreach (var op in ops)
+            {
+                TimeSpan diff = DateTime.UtcNow - op.Date;
                 if (diff.Duration() < TimeSpan.FromMinutes(30))
                     return false;
             }
