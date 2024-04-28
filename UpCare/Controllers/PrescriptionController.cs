@@ -53,7 +53,8 @@ namespace UpCare.Controllers
             if (prescription is null)
                 return NotFound(new ApiResponse(404, "no data found"));
 
-            return Ok(prescription);
+
+            return Ok(await MapToPrescriptionDto(prescription));
         }
 
         [HttpPost("add")] // POST: /api/prescription/add
