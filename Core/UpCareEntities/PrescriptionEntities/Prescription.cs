@@ -10,7 +10,9 @@ namespace Core.UpCareEntities.PrescriptionEntities
     {
         public string Diagnosis { get; set; }
         public string Details { get; set; }
-        public DateTime DateTime { get; set; }
+        public string FK_DoctorId { get; set; }
+        public string FK_PatientId { get; set; }
+        public DateTime DateTime { get; set; } = DateTime.UtcNow;
         public string Advice { get; set; }
     }
 }

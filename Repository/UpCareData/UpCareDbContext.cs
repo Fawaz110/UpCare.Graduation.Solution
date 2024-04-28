@@ -34,7 +34,6 @@ namespace Repository.UpCareData
         #region Prescription & Related Tables
         public DbSet<Prescription> Prescriptions { get; set; }
         public DbSet<MedicineInPrescription> MedicineInPrescriptions { get; set; }
-        public DbSet<DoctorGivePrescription> DoctorGivePrescriptions { get; set; }
         public DbSet<CheckupInPrescription> CheckupInPrescriptions { get; set; }
         public DbSet<RadiologyInPrescription> RadiologyInPrescriptions { get; set; }
         #endregion

@@ -21,6 +21,7 @@ namespace UpCare.Extensions
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IPatientRoomRepository, PatientRoomRepository>();
             services.AddScoped<IConsultationRepository, ConsultationRepository>();
+            services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
             services.AddScoped<IOperationRepository, OperationRepository>();
 
             #endregion
@@ -40,6 +41,7 @@ namespace UpCare.Extensions
             services.AddScoped<IAppointmentService, AppointmentService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IOperationService, OperationService>();
+            services.AddScoped<IPrescriptionService, PrescriptionService>();
             services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
 
             #endregion

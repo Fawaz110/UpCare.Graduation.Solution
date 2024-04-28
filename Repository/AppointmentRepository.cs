@@ -14,34 +14,36 @@ namespace Repository
     {
         private readonly UpCareDbContext _context;
 
+        public UpCareDbContext Context => _context;
+
         public AppointmentRepository(
             UpCareDbContext context)
         {
             _context = context;
         }
         public async Task AddAppointmentAsync(PatientAppointment patientAppointment)
-            => await _context.Set<PatientAppointment>().AddAsync(patientAppointment);
+            => await Context.Set<PatientAppointment>().AddAsync(patientAppointment);
 
         public void DeleteAsync(PatientAppointment patientAppointment)
-            => _context.Set<PatientAppointment>().Remove(patientAppointment);
+            => Context.Set<PatientAppointment>().Remove(patientAppointment);
 
         public async Task<List<PatientAppointment>> GetByDoctorIdAsync(string doctorId)
-            => await _context.Set<PatientAppointment>().Where(pc => pc.FK_DoctorId == doctorId).ToListAsync();
+            => await Context.Set<PatientAppointment>().Where(pc => pc.FK_DoctorId == doctorId).ToListAsync();
 
         public async Task<List<PatientAppointment>> GetByPatientIdAsync(string patientId)
-            => await _context.Set<PatientAppointment>().Where(pc => pc.FK_PatientId == patientId).ToListAsync();
+            => await Context.Set<PatientAppointment>().Where(pc => pc.FK_PatientId == patientId).ToListAsync();
 
         public async Task<List<PatientAppointment>> GetAppointmentsBetweenPatientAndDoctorAsync(string patientId, string doctorId)
-            => await _context.Set<PatientAppointment>().Where(pc => pc.FK_DoctorId == doctorId
+            => await Context.Set<PatientAppointment>().Where(pc => pc.FK_DoctorId == doctorId
                                                                   && pc.FK_PatientId == patientId).ToListAsync();
 
         public async Task<PatientAppointment> GetNextAppointmentAsync(string patientId, string doctorId)
-            => await _context.Set<PatientAppointment>().FirstOrDefaultAsync(pc => pc.FK_PatientId == patientId
+            => await Context.Set<PatientAppointment>().FirstOrDefaultAsync(pc => pc.FK_PatientId == patientId
                                                                                 && pc.FK_DoctorId == doctorId
                                                                                 && pc.DateTime > DateTime.UtcNow);
 
         public async Task<PatientAppointment> GetWithSpec(PatientAppointment appointment)
-            => await _context.Set<PatientAppointment>().FirstOrDefaultAsync(x => x.FK_PatientId == appointment.FK_PatientId
+            => await Context.Set<PatientAppointment>().FirstOrDefaultAsync(x => x.FK_PatientId == appointment.FK_PatientId
                                                                                && x.FK_DoctorId == appointment.FK_DoctorId
                                                                                && x.DateTime == appointment.DateTime);
     }
