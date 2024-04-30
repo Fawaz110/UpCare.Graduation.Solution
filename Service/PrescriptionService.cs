@@ -33,6 +33,8 @@ namespace Service
         {
             await _unitOfWork.Repository<Prescription>().Add(prescription);
 
+            var result = await _unitOfWork.CompleteAsync();
+
             if (medicines != null && medicines.Count() != 0)
                 foreach (var medicine in medicines)
                 {
@@ -69,14 +71,13 @@ namespace Service
                     await _prescriptionRepository.AddRadiologyToPrescriptionAsync(itemToAdd);
                 }
 
-            var result = await _unitOfWork.CompleteAsync();
+            result = await _unitOfWork.CompleteAsync();
 
             if (result <= 0) return null;
 
             return prescription;
         }
-            
-
+        
         public async Task<List<Prescription>> GetAllPrescriptionAsync(string? doctorId = null, string? patientId = null)
         {
             var data = (await _prescriptionRepository.GetAllAsync()).ToList();

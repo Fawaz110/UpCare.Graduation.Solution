@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Service;
 using UpCare.DTOs;
 using UpCare.DTOs.PrescriptionDtos;
+using UpCare.DTOs.ZonesDtos;
 using UpCare.Errors;
 
 namespace UpCare.Controllers
@@ -18,17 +19,26 @@ namespace UpCare.Controllers
         private readonly IPrescriptionService _prescriptionService;
         private readonly UserManager<Patient> _patientManager;
         private readonly UserManager<Doctor> _doctorManager;
+        private readonly UserManager<CheckupLab> _checkupLabManager;
+        private readonly UserManager<RadiologyLab> _radiologyLabManager;
+        private readonly UserManager<Pharmacy> _pharmacyManager;
         private readonly IUnitOfWork _unitOfWork;
 
         public PrescriptionController(
             UserManager<Patient> patientManager,
             UserManager<Doctor> doctorManager,
+            UserManager<CheckupLab> checkupLabManager,
+            UserManager<RadiologyLab> radiologyLabManager,
+            UserManager<Pharmacy> pharmacyManager,
             IPrescriptionService prescriptionService,
             IUnitOfWork unitOfWork)
         {
             _prescriptionService = prescriptionService;
             _patientManager = patientManager;
             _doctorManager = doctorManager;
+            _checkupLabManager = checkupLabManager;
+            _radiologyLabManager = radiologyLabManager;
+            _pharmacyManager = pharmacyManager;
             _unitOfWork = unitOfWork;
         }
 
@@ -137,7 +147,108 @@ namespace UpCare.Controllers
             });
         }
 
+        [HttpGet("rs/checkup/{checkupId}")] // GET: /api/prescription/rs/checkup/{checkupLabId}
+        public async Task<ActionResult<List<CheckupZoneInPrescriptionDto>>> GetCheckupForLab(string checkupId)
+        {
+            var lab = await _checkupLabManager.FindByIdAsync(checkupId);
 
+            if (lab is null) 
+                return Unauthorized(new ApiResponse(401, "unauthorized access"));
+
+            var prescriptions = await _unitOfWork.Repository<Prescription>().GetAllAsync();
+
+            if (prescriptions.Count() == 0) 
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            var mappedPrescriptions = await MapToPrescriptionDto(prescriptions.ToList());
+
+            var checkups = new List<CheckupZoneInPrescriptionDto>();
+            
+            checkups = mappedPrescriptions.Select(prescription => new CheckupZoneInPrescriptionDto
+                                                                      {
+                                                                          FK_PrescriptionId = prescription.Id,
+                                                                          Patient = prescription.Patient,
+                                                                          DateTime = prescription.DateTime,
+                                                                          Checkups = prescription.Checkups,
+                                                                          Total = prescription.Checkups.Sum(c => c.Price)
+                                                                      }).Where(x=>x.Total != 0).ToList();
+
+            if (checkups.Count() == 0) 
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            var ordered = checkups.OrderByDescending(x => x.DateTime);
+
+            return Ok(ordered);
+        }
+
+        [HttpGet("rs/radiology/{radiologyId}")] // GET: /api/prescription/rs/radiology/{radiologyId}
+        public async Task<ActionResult<List<RadiologyZoneInPrescriptionDto>>> GetRadiologyForLab(string radiologyId)
+        {
+            var lab = await _radiologyLabManager.FindByIdAsync(radiologyId);
+
+            if (lab is null)
+                return Unauthorized(new ApiResponse(401, "unauthorized access"));
+
+            var prescriptions = await _unitOfWork.Repository<Prescription>().GetAllAsync();
+
+            if (prescriptions.Count() == 0)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            var mappedPrescriptions = await MapToPrescriptionDto(prescriptions.ToList());
+
+            var radiologies = new List<RadiologyZoneInPrescriptionDto>();
+
+            radiologies = mappedPrescriptions.Select(prescription => new RadiologyZoneInPrescriptionDto
+                                                                        {
+                                                                            FK_PrescriptionId = prescription.Id,
+                                                                            Patient = prescription.Patient,
+                                                                            DateTime = prescription.DateTime,
+                                                                            Radiologies = prescription.Radiologies,
+                                                                            Total = prescription.Radiologies.Sum(c => c.Price)
+                                                                        }).Where(x=>x.Total != 0).ToList();
+
+            if (radiologies.Count() == 0)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            var ordered = radiologies.OrderByDescending(x => x.DateTime);
+
+            return Ok(ordered);
+        }
+
+        [HttpGet("rs/medicine/{pharmacyId}")] // GET: /api/prescription/rs/medicine/{pharmacyId}
+        public async Task<ActionResult<List<PharmacyZoneInPrescription>>> GetMedicineInEachPrescription(string pharmacyId)
+        {
+            var pharmacy = await _pharmacyManager.FindByIdAsync(pharmacyId);
+
+            if (pharmacy is null)
+                return Unauthorized(new ApiResponse(401, "unauthorized access"));
+
+            var prescriptions = await _unitOfWork.Repository<Prescription>().GetAllAsync();
+
+            if (prescriptions.Count() == 0)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            var mappedPrescriptions = await MapToPrescriptionDto(prescriptions.ToList());
+
+            var medicinePackages = new List<PharmacyZoneInPrescription>();
+
+            medicinePackages = mappedPrescriptions.Select(prescription => new PharmacyZoneInPrescription
+            {
+                FK_PrescriptionId = prescription.Id,
+                Patient = prescription.Patient,
+                DateTime = prescription.DateTime,
+                Medicines = prescription.Medicines,
+                Total = prescription.Medicines.Sum(c => c.Price)
+            }).Where(x => x.Total != 0).ToList();
+
+            if (medicinePackages.Count() == 0)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            var ordered = medicinePackages.OrderByDescending(x => x.DateTime);
+
+            return Ok(ordered);
+        }
+        
         // methods to map => Dtos
         private async Task<List<PrescriptionDto>> MapToPrescriptionDto(List<Prescription> data)
         {

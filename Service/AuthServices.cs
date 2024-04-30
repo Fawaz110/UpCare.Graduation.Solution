@@ -14,7 +14,8 @@ namespace Service
     {
         private readonly IConfiguration _configuration;
 
-        public AuthServices(IConfiguration configuration)
+        public AuthServices(
+            IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -205,5 +206,6 @@ namespace Service
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }
