@@ -1,10 +1,10 @@
-﻿namespace Core.UpCareEntities.BillEntities
+﻿namespace UpCare.DTOs
 {
-    public class Bill : BaseEntity
+    public class BillDto
     {
-        public string FK_Payor { get; set; }
         public string DeliveredService { get; set; }
         public decimal PaidMoney { get; set; }
         public DateTime DateTime { get; set; }
+        public Core.UpCareUsers.Patient Payor { get; set; }
     }
 }
