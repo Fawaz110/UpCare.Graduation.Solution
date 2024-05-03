@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.UpCareData;
 
@@ -11,9 +12,10 @@ using Repository.UpCareData;
 namespace Repository.UpCareData.Migrations
 {
     [DbContext(typeof(UpCareDbContext))]
-    partial class UpCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240502133435_modifyTypeOfIdInRoomId")]
+    partial class modifyTypeOfIdInRoomId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +42,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Checkups", (string)null);
+                    b.ToTable("Checkups");
                 });
 
             modelBuilder.Entity("Core.Entities.UpCareEntities.Operation", b =>
@@ -64,7 +66,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Operations", (string)null);
+                    b.ToTable("Operations");
                 });
 
             modelBuilder.Entity("Core.Entities.UpCareEntities.Radiology", b =>
@@ -89,7 +91,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Radiologies", (string)null);
+                    b.ToTable("Radiologies");
                 });
 
             modelBuilder.Entity("Core.Entities.UpCareEntities.Room", b =>
@@ -115,7 +117,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Rooms", (string)null);
+                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.BillEntities.Bill", b =>
@@ -138,7 +140,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Bills", (string)null);
+                    b.ToTable("Bills");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.BillEntities.CheckupInBill", b =>
@@ -154,7 +156,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_CheckupId", "FK_BillId");
 
-                    b.ToTable("CheckupInBills", (string)null);
+                    b.ToTable("CheckupInBills");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.BillEntities.MedicineInBill", b =>
@@ -167,7 +169,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_MedicineId", "FK_BillId");
 
-                    b.ToTable("MedicineInBills", (string)null);
+                    b.ToTable("MedicineInBills");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.BillEntities.RadiologyInBill", b =>
@@ -180,7 +182,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_RadiologyId", "FK_BillId");
 
-                    b.ToTable("RadiologyInBill", (string)null);
+                    b.ToTable("RadiologyInBill");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.DoctorDoOperation", b =>
@@ -204,7 +206,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_PatientId", "FK_OperationId", "Date");
 
-                    b.ToTable("DoctorDoOperations", (string)null);
+                    b.ToTable("DoctorDoOperations");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.Feedback", b =>
@@ -231,7 +233,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Feedbacks", (string)null);
+                    b.ToTable("Feedbacks");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.Medicine", b =>
@@ -276,7 +278,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Medicines", (string)null);
+                    b.ToTable("Medicines");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.Message", b =>
@@ -304,7 +306,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.NurseCare", b =>
@@ -339,7 +341,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_NurseId", "FK_RoomId", "FK_PatientId", "DateTime");
 
-                    b.ToTable("NurseCares", (string)null);
+                    b.ToTable("NurseCares");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PatientAppointment", b =>
@@ -358,7 +360,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_PatientId", "FK_DoctorId", "DateTime");
 
-                    b.ToTable("PatientAppointments", (string)null);
+                    b.ToTable("PatientAppointments");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PatientBookRoom", b =>
@@ -383,7 +385,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_PatientId", "FK_DoctorId", "FK_RoomId");
 
-                    b.ToTable("PatientBookRooms", (string)null);
+                    b.ToTable("PatientBookRooms");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PatientConsultation", b =>
@@ -402,7 +404,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_PatientId", "FK_DoctorId", "DateTime");
 
-                    b.ToTable("PatientConsultations", (string)null);
+                    b.ToTable("PatientConsultations");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PrescriptionEntities.CheckupInPrescription", b =>
@@ -415,7 +417,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_CheckupId", "FK_PrescriptionId");
 
-                    b.ToTable("CheckupInPrescriptions", (string)null);
+                    b.ToTable("CheckupInPrescriptions");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PrescriptionEntities.MedicineInPrescription", b =>
@@ -428,7 +430,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_MedicineId", "FK_PrescriptionId");
 
-                    b.ToTable("MedicineInPrescriptions", (string)null);
+                    b.ToTable("MedicineInPrescriptions");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PrescriptionEntities.Prescription", b =>
@@ -464,7 +466,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Prescriptions", (string)null);
+                    b.ToTable("Prescriptions");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PrescriptionEntities.RadiologyInPrescription", b =>
@@ -477,7 +479,7 @@ namespace Repository.UpCareData.Migrations
 
                     b.HasKey("FK_PrescriptionId", "FK_RadiologyId");
 
-                    b.ToTable("RadiologyInPrescriptions", (string)null);
+                    b.ToTable("RadiologyInPrescriptions");
                 });
 #pragma warning restore 612, 618
         }
