@@ -52,6 +52,7 @@ namespace UpCare.Controllers
         public async Task<ActionResult<UserDto>> Login(LoginDto model)
         {
             var user = await _patientManager.FindByEmailAsync(model.Email);
+
             if (user is null)
                 return Unauthorized(new ApiResponse(401));
 
@@ -62,6 +63,7 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
@@ -98,6 +100,7 @@ namespace UpCare.Controllers
 
             else
                 return BadRequest(new ApiValidationErrorResponse());
+
             var result = await _patientManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded is false)
@@ -113,11 +116,13 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
                 Token = await _authServices.CreateTokenAsync(user, _patientManager),
-                UserRole = "patient"
+                UserRole = "patient",
+                UserName = user.UserName
             });
         }
 

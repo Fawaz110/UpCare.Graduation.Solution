@@ -89,7 +89,6 @@ namespace UpCare.Controllers
                 selectedBills = await MapToBillDto(bills.ToList());
             }
 
-            
             // elmafrood 7aga tehsal hena mesh 3aref heya eah
 
             if (selectedBills.Count() == 0)

@@ -10,5 +10,6 @@ namespace Core.UpCareEntities.PrescriptionEntities
     {
         public int FK_RadiologyId { get; set; }
         public int FK_PrescriptionId { get; set; }
+
     }
 }
