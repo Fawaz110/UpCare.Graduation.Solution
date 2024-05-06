@@ -9,7 +9,7 @@ namespace Repository.UpCareData.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "FK_Payor",
+                name: "FK_PayorId",
                 table: "Bills",
                 type: "nvarchar(max)",
                 nullable: false,
@@ -19,7 +19,7 @@ namespace Repository.UpCareData.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "FK_Payor",
+                name: "FK_PayorId",
                 table: "Bills");
         }
     }

@@ -46,6 +46,7 @@ namespace UpCare.Extensions
             services.AddScoped<IPrescriptionService, PrescriptionService>();
             services.AddScoped<INurseCareService, NurseCareService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IBillService, BillService>();
             services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
 
             #endregion

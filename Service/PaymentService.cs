@@ -15,15 +15,18 @@ namespace Service
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPrescriptionService _prescriptionService;
+        private readonly IBillService _billService;
 
         public PaymentService(
             IConfiguration configuration,
             IUnitOfWork unitOfWork,
-            IPrescriptionService prescriptionService)
+            IPrescriptionService prescriptionService,
+            IBillService billService)
         {
             _configuration = configuration;
             _unitOfWork = unitOfWork;
             _prescriptionService = prescriptionService;
+            _billService = billService;
         }
         public async Task<Prescription> CreateOrUpdatePaymentIntent(int prescriptionId, Payment payment)
         {
@@ -348,5 +351,9 @@ namespace Service
 
             return (result <= 0)? null : prescription;
         }
+
+        public async Task<Bill> UpdatePaymentIntentToSucceededOrFailed(string paymentIntentId, bool isSucceeded)
+            => await _billService.GetWithPaymentIntent(paymentIntentId);
+        
     }
 }

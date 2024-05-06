@@ -1,4 +1,4 @@
-﻿namespace UpCare.DTOs
+﻿namespace UpCare.DTOs.BillDtos
 {
     public class BillDto
     {

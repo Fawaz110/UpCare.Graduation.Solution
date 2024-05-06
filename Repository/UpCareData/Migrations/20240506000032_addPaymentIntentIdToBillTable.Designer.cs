@@ -135,7 +135,7 @@ namespace Repository.UpCareData.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FK_Payor")
+                    b.Property<string>("FK_PayorId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
