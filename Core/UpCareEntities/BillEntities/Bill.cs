@@ -5,6 +5,8 @@
         public string FK_Payor { get; set; }
         public string DeliveredService { get; set; }
         public decimal PaidMoney { get; set; }
+        public string PaymentIntentId { get; set; } = string.Empty;
         public DateTime DateTime { get; set; } = DateTime.UtcNow;
+        
     }
 }
