@@ -1,4 +1,5 @@
 ﻿using Core.Services.Contract;
+using Core.UpCareEntities;
 using Core.UpCareEntities.PrescriptionEntities;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Http;

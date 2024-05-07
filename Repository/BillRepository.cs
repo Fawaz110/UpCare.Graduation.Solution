@@ -16,6 +16,16 @@ namespace Repository
         {
             _context = context;
         }
+
+        public async Task AddCheckupToBillAsync(CheckupInBill checkupInBill)
+           => await _context.Set<CheckupInBill>().AddAsync(checkupInBill);
+
+        public async Task AddMedicineToBillAsync(MedicineInBill medicineInBill)
+            => await _context.Set<MedicineInBill>().AddAsync(medicineInBill);
+
+        public async Task AddRadiologyToBillAsync(RadiologyInBill radiologyInBill)
+            => await _context.Set<RadiologyInBill>().AddAsync(radiologyInBill);
+
         public async Task<List<Checkup>> GetCheckupByBillId(int billId)
         {
             var listOfRelation = await _context.Set<CheckupInBill>().Where(x => x.FK_BillId == billId).ToListAsync();

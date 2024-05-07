@@ -79,8 +79,25 @@ namespace UpCare.Controllers
             };
 
             // Cont.. Form Here
+            // Get Medicine, Radiologies, Checkups depends on BillToAddDto.Payment
+            #region Get Related Data To Bill Depends On Payment Sent
 
-            var result = await _billService.AddAsync(bill);
+            var medicineList = new List<MedicineInPrescription>();
+            var checkupList = new List<CheckupInPrescription>();
+            var radiologyList = new List<RadiologyInPrescription>();
+
+            if (model.Payment == Payment.All || model.Payment == Payment.Medicine)
+                medicineList = await _prescriptionService.GetMedicineByPrescriptionIdAsync(model.PrescriptionId);
+
+            if (model.Payment == Payment.All || model.Payment == Payment.Checkup)
+                checkupList = await _prescriptionService.GetCheckupByPrescriptionIdAsync(model.PrescriptionId);
+
+            if (model.Payment == Payment.All || model.Payment == Payment.Radiology)
+                radiologyList = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(model.PrescriptionId);
+
+            #endregion
+
+            var result = await _billService.AddAsync(bill, medicineList, checkupList, radiologyList);
 
             if (result is null)
                 return BadRequest(new ApiResponse(400, "an error occured during adding data"));
@@ -128,13 +145,8 @@ namespace UpCare.Controllers
 
             foreach (var record in data)
             {
-                var mappedItem = new BillDto
-                {
-                    DateTime = record.DateTime,
-                    DeliveredService = record.DeliveredService,
-                    PaidMoney = record.PaidMoney,
-                    Payor = await _patientManager.FindByIdAsync(record.FK_PayorId)
-                };
+                var mappedItem = await MapToBillDto(record);
+
                 mapped.Add(mappedItem);
             }
 
@@ -142,16 +154,17 @@ namespace UpCare.Controllers
         }
 
         private async Task<BillDto> MapToBillDto(Bill data)
-        {
-            return new BillDto
+            => new BillDto
             {
                 DateTime = data.DateTime,
                 DeliveredService = data.DeliveredService,
                 PaidMoney = data.PaidMoney,
-                Payor = await _patientManager.FindByIdAsync(data.FK_PayorId)
+                Payor = await _patientManager.FindByIdAsync(data.FK_PayorId),
+                Medicines = await _billService.GetMedicineInBillAsync(data.Id),
+                Checkups = await _billService.GetCheckupInBillAsync(data.Id),
+                Radiologies = await _billService.GetRadiologiesInBillAsync(data.Id)
             };
-        }
-
+        
         private async Task<decimal> CalcPaidMoney(int prescriptionId, Payment payment)
         {
             var totalPaid = 0m;

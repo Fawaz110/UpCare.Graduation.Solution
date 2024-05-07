@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.UpCareData;
 
@@ -11,9 +12,10 @@ using Repository.UpCareData;
 namespace Repository.UpCareData.Migrations
 {
     [DbContext(typeof(UpCareDbContext))]
-    partial class UpCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240507204728_addColumnPatientConsultation")]
+    partial class addColumnPatientConsultation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -360,10 +362,6 @@ namespace Repository.UpCareData.Migrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentIntentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");

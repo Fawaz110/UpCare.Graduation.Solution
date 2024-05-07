@@ -5,6 +5,7 @@ using Core.UpCareEntities;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace Service
 {
@@ -35,6 +36,7 @@ namespace Service
         public async Task<PatientConsultation> AddConsultationAsync(PatientConsultation patientConsultation)
         {
             var patient = await _patientManager.FindByIdAsync(patientConsultation.FK_PatientId);
+
             var doctor = await _doctorManager.FindByIdAsync(patientConsultation.FK_DoctorId);
 
             if (patient is null || doctor is null) 
@@ -42,6 +44,32 @@ namespace Service
 
             if (!(await ConsultationTimeIsAvailable(patientConsultation)))
                 return null;
+
+            PaymentIntentService paymentIntentService = new PaymentIntentService();
+
+            PaymentIntent paymentIntent;
+
+            if (string.IsNullOrEmpty(patientConsultation.PaymentIntentId)) // Create PaymentIntent
+            {
+                var options = new PaymentIntentCreateOptions
+                {
+                    Amount = (long)(doctor.ConsultationPrice * 100),
+                    PaymentMethodTypes = new List<string>() { "card" },
+                    Currency = "usd"
+                };
+                if(options.Amount > 0)
+                    paymentIntent = await paymentIntentService.CreateAsync(options);
+            }
+            else // Update PaymentIntent
+            {
+                var options = new PaymentIntentUpdateOptions
+                {
+                    Amount = (long)(doctor.ConsultationPrice * 100)
+                };
+
+                if (options.Amount > 0)
+                    paymentIntent = await paymentIntentService.UpdateAsync(patientConsultation.PaymentIntentId, options);
+            }
 
             await _consultationRepository.AddConsultationAsync(patientConsultation);
             await _unitOfWork.CompleteAsync();

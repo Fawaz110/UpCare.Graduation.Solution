@@ -4,6 +4,7 @@ using Core.UnitOfWork.Contract;
 using Core.UpCareEntities;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
+using Stripe;
 
 namespace Repository
 {
@@ -46,6 +47,32 @@ namespace Repository
 
             if (!(await ConsultationTimeIsAvailable(appointment)))
                 return null;
+
+            PaymentIntentService paymentIntentService = new PaymentIntentService();
+
+            PaymentIntent paymentIntent;
+
+            if (string.IsNullOrEmpty(appointment.PaymentIntentId)) // Create PaymentIntent
+            {
+                var options = new PaymentIntentCreateOptions
+                {
+                    Amount = (long)(doctor.AppointmentPrice * 100),
+                    PaymentMethodTypes = new List<string>() { "card" },
+                    Currency = "usd"
+                };
+                if (options.Amount > 0)
+                    paymentIntent = await paymentIntentService.CreateAsync(options);
+            }
+            else // Update PaymentIntent
+            {
+                var options = new PaymentIntentUpdateOptions
+                {
+                    Amount = (long)(doctor.AppointmentPrice * 100)
+                };
+
+                if (options.Amount > 0)
+                    paymentIntent = await paymentIntentService.UpdateAsync(appointment.PaymentIntentId, options);
+            }
 
             await _appointmentRepository.AddAppointmentAsync(appointment);
             await _unitOfWork.CompleteAsync();
