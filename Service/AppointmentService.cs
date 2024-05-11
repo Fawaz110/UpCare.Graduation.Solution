@@ -61,7 +61,11 @@ namespace Repository
                     Currency = "usd"
                 };
                 if (options.Amount > 0)
+                {
                     paymentIntent = await paymentIntentService.CreateAsync(options);
+                    appointment.PaymentIntentId = paymentIntent.Id;
+                    appointment.ClientSecret = paymentIntent.ClientSecret;
+                }
             }
             else // Update PaymentIntent
             {
@@ -72,6 +76,7 @@ namespace Repository
 
                 if (options.Amount > 0)
                     paymentIntent = await paymentIntentService.UpdateAsync(appointment.PaymentIntentId, options);
+                
             }
 
             await _appointmentRepository.AddAppointmentAsync(appointment);

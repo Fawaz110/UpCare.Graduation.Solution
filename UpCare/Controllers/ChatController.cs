@@ -6,6 +6,9 @@ namespace UpCare.Controllers
 {
     public class ChatController : BaseApiController
     {
-
+        public ChatController()
+        {
+            
+        }
     }
 }

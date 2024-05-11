@@ -41,6 +41,7 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
@@ -119,14 +120,32 @@ namespace UpCare.Controllers
         {
             var specialities = await _userManager.Users.Select(d => d.Speciality).Where(s => s != "").Distinct().ToListAsync();
 
+            List<SpecialityDto> result = new List<SpecialityDto>();
+            foreach (var speicality in specialities)
+            {
+                var number = _userManager.Users.Select(x => x.Speciality == speicality).Count();
+
+                result.Add(new SpecialityDto { Speciality = speicality, DoctorWithSPeciality = number });
+            }
+
+
+
             if (specialities.Count() == 0)
                 return NotFound(new ApiResponse(404, "no data founded"));
 
-            return Ok(specialities);
+            return Ok(result);
         }
+
+        
 
         /*
          *      1. Prescription (CRUDS)
          */
+    }
+
+    public class SpecialityDto
+    {
+        public string Speciality { get; set; }
+        public int DoctorWithSPeciality { get; set; }
     }
 }

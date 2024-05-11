@@ -86,20 +86,8 @@ namespace UpCare.Controllers
                 BloodType = model.BloodType,
                 Gender = (model.Gender == "male") ? Gender.Male : Gender.Female,
                 FK_ReceptionistId = model.ReceptionistId,
-                //DateOfBirth = model.DateOfBirth,
+                DateOfBirth = model.DateOfBirth,
             };
-            //user.DateOfBirth.Day = model.DateOfBirth.
-            var dayMonthYear = model.DateOfBirth.Split("-").Select(int.Parse).ToArray();
-
-            if (dayMonthYear.Length == 3 &&
-                dayMonthYear[0] >= 1 && dayMonthYear[0] <= 31 &&
-                dayMonthYear[1] >= 1 && dayMonthYear[1] <= 12 &&
-                dayMonthYear[2] >= 1900 && dayMonthYear[2] <= DateTime.Now.Year)
-                // Create DateTime object if values are valid
-                user.DateOfBirth = new DateTime(dayMonthYear[2], dayMonthYear[1], dayMonthYear[0]);
-
-            else
-                return BadRequest(new ApiValidationErrorResponse());
 
             var result = await _patientManager.CreateAsync(user, model.Password);
 

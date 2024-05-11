@@ -39,7 +39,8 @@ namespace UpCare.Controllers
                 return Unauthorized(new ApiResponse(401, "incorrect email or password"));
 
             return Ok(new UserDto()
-            {
+            {   
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,

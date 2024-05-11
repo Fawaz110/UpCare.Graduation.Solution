@@ -5,6 +5,7 @@ using Core.UpCareEntities;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Stripe;
 
 namespace Service
@@ -17,6 +18,7 @@ namespace Service
         private readonly IOperationRepository _operationRepository;
         private readonly UserManager<Patient> _patientManager;
         private readonly UserManager<Doctor> _doctorManager;
+        private readonly IConfiguration _configuration;
 
         public ConsultationService(
             IUnitOfWork unitOfWork,
@@ -24,7 +26,8 @@ namespace Service
             IAppointmentRepository appointmentRepository,
             IOperationRepository operationRepository,
             UserManager<Patient> patientManager,
-            UserManager<Doctor> doctorManager)
+            UserManager<Doctor> doctorManager,
+            IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _consultationRepository = consultationRepository;
@@ -32,6 +35,7 @@ namespace Service
             _operationRepository = operationRepository;
             _patientManager = patientManager;
             _doctorManager = doctorManager;
+            _configuration = configuration;
         }
         public async Task<PatientConsultation> AddConsultationAsync(PatientConsultation patientConsultation)
         {
@@ -44,6 +48,8 @@ namespace Service
 
             if (!(await ConsultationTimeIsAvailable(patientConsultation)))
                 return null;
+
+            StripeConfiguration.ApiKey = _configuration["StripeSettings:SecretKey"];
 
             PaymentIntentService paymentIntentService = new PaymentIntentService();
 
@@ -58,7 +64,11 @@ namespace Service
                     Currency = "usd"
                 };
                 if(options.Amount > 0)
+                {
                     paymentIntent = await paymentIntentService.CreateAsync(options);
+                    patientConsultation.PaymentIntentId = paymentIntent.Id;
+                    patientConsultation.ClientSecret = paymentIntent.ClientSecret;
+                }
             }
             else // Update PaymentIntent
             {
@@ -68,7 +78,11 @@ namespace Service
                 };
 
                 if (options.Amount > 0)
+                {
                     paymentIntent = await paymentIntentService.UpdateAsync(patientConsultation.PaymentIntentId, options);
+                    patientConsultation.PaymentIntentId = paymentIntent.Id;
+                    patientConsultation.ClientSecret = paymentIntent.ClientSecret;
+                }
             }
 
             await _consultationRepository.AddConsultationAsync(patientConsultation);
@@ -212,5 +226,8 @@ namespace Service
 
             return true;
         }
+
+        public async Task<List<PatientConsultation>> GetAllConsultationsAsync()
+            => await _consultationRepository.GetAllAsync();
     }
 }

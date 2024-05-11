@@ -38,6 +38,7 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,

@@ -13,5 +13,7 @@ namespace UpCare.DTOs.PatientDtos
         public DateTime DateTime { get; set; } = DateTime.UtcNow;
         [Required]
         public ConsultationType Type { get; set; }
+        public string PaymentIntentId { get; set; }
+        public string ClientSecret { get; set; }
     }
 }

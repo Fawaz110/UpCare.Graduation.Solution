@@ -63,7 +63,6 @@ namespace UpCare.Controllers
                     case Events.PaymentIntentPaymentFailed:
                         // logic in case of payment failed
                         await _paymentService.UpdatePaymentIntentToSucceededOrFailed(paymentIntent.Id, false);
-
                         break;
                 }
 

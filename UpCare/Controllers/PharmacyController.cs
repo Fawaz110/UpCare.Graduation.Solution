@@ -40,6 +40,7 @@ namespace UpCare.Controllers
 
             return Ok(new PharmacyUserDto()
             {
+                Id = user.Id,
                 UserName = user.Name,
                 Email = model.Email,
                 Token = await _authServices.CreateTokenAsync(user, _userManager),
