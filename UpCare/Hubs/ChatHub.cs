@@ -35,61 +35,59 @@ namespace UpCare.Hubs
             _context = context;
             _mediator = mediator;
         }
-        public async Task<bool> SendMessageFromAdminToDoctor(string adminId, string doctorId, string content)
-        {
-            var sender = await _adminManager.FindByIdAsync(adminId);
+        //public async Task sendMessage(string adminId, string doctorId, string content)
+        //{
+        //    var sender = await _adminManager.FindByIdAsync(adminId);
 
-            if (sender is null)
-                return false;
+        //    if (sender is null)
+        //        return;
 
-            var doctor = await _doctorManager.FindByIdAsync(doctorId);
+        //    var doctor = await _doctorManager.FindByIdAsync(doctorId);
 
-            if (doctor is null)
-                return false;
+        //    if (doctor is null)
+        //        return;
 
-            var message = new Message
-            {
-                SenderId = adminId,
-                ReceiverId = doctorId,
-                Content = content
-            };
+        //    var message = new Message
+        //    {
+        //        SenderId = adminId,
+        //        ReceiverId = doctorId,
+        //        Content = content
+        //    };
 
-            await _context.Set<Message>().AddAsync(message);
+        //    await _context.Set<Message>().AddAsync(message);
 
-            await _context.SaveChangesAsync();
+        //    await _context.SaveChangesAsync();
 
-            var doctorConnection = _context.Set<UserConnection>().FirstOrDefault(x => x.FK_UserId == doctor.Id);
+        //    var doctorConnection = _context.Set<UserConnection>().FirstOrDefault(x => x.FK_UserId == doctor.Id);
 
-            Clients.Client(doctorConnection.ConnectionId).SendAsync("sendFromAdminToDoctor", sender.Id, message);
+        //    await Clients.All.SendAsync("newMessage", sender.FirstName, message);
+        //}
 
-            return true;
-        }
+        //public override Task OnConnectedAsync()
+        //{
+        //    var newConnection = new UserConnection
+        //    {
+        //        ConnectionId = Context.ConnectionId,
+        //        FK_UserId = Context.UserIdentifier
+        //    };
 
-        public override Task OnConnectedAsync()
-        {
-            var newConnection = new UserConnection
-            {
-                ConnectionId = Context.ConnectionId,
-                FK_UserId = Context.UserIdentifier
-            };
+        //    _context.Set<UserConnection>().Add(newConnection);
 
-            _context.Set<UserConnection>().Add(newConnection);
-
-            _context.SaveChanges();
+        //    _context.SaveChanges();
             
-            return base.OnConnectedAsync();
-        }
+        //    return base.OnConnectedAsync();
+        //}
 
-        public override Task OnDisconnectedAsync(Exception? exception)
-        {
-            var connectionToRemove = _context.Set<UserConnection>().FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+        //public override Task OnDisconnectedAsync(Exception? exception)
+        //{
+        //    var connectionToRemove = _context.Set<UserConnection>().FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
 
-            if(connectionToRemove != null) 
-                _context.Set<UserConnection>().Remove(connectionToRemove);
+        //    if(connectionToRemove != null) 
+        //        _context.Set<UserConnection>().Remove(connectionToRemove);
 
-            _context.SaveChanges();
+        //    _context.SaveChanges();
 
-            return base.OnDisconnectedAsync(exception);
-        }
+        //    return base.OnDisconnectedAsync(exception);
+        //}
     }
 }

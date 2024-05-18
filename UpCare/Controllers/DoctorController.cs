@@ -121,9 +121,10 @@ namespace UpCare.Controllers
             var specialities = await _userManager.Users.Select(d => d.Speciality).Where(s => s != "").Distinct().ToListAsync();
 
             List<SpecialityDto> result = new List<SpecialityDto>();
+
             foreach (var speicality in specialities)
             {
-                var number = _userManager.Users.Select(x => x.Speciality == speicality).Count();
+                var number = _userManager.Users.Where(x => x.Speciality == speicality).Count();
 
                 result.Add(new SpecialityDto { Speciality = speicality, DoctorWithSPeciality = number });
             }
