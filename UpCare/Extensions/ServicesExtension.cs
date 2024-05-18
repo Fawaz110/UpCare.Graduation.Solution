@@ -57,6 +57,7 @@ namespace UpCare.Extensions
             services.AddScoped(typeof(UserManager<>));
             services.AddScoped(typeof(RoleManager<>));
             services.AddScoped<FireBaseServices>();
+            services.AddScoped<IMediator, Mediator>();
             services.AddControllers();
 
             services.AddSignalR();

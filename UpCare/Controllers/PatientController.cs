@@ -95,10 +95,8 @@ namespace UpCare.Controllers
             {
                 var error = new ApiValidationErrorResponse();
                 foreach (var item in result.Errors)
-                {
                     error.Errors.Add(item.Code);
-                }
-
+                
                 return BadRequest(error);
             }
 
