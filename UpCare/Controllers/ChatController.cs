@@ -137,27 +137,14 @@ namespace UpCare.Controllers
             foreach (var group in groupedList)
             {
                 var itemToAdd = new MessagePackageToReturn();
-                var firstInGroup = group.FirstOrDefault();
 
-                MessagerRole keyRole =
-                    (firstInGroup.SenderRole == role || firstInGroup.SenderId == id) ?
-                        keyRole = firstInGroup.ReceiverRole
-                      : keyRole = firstInGroup.SenderRole;
+                itemToAdd.ClientId = group.Key;
 
                 ///if (firstInGroup.SenderRole == role || firstInGroup.SenderId == id)
                 ///    keyRole = firstInGroup.ReceiverRole;
                 ///else
                 ///    keyRole = firstInGroup.SenderRole;
 
-                if (keyRole == MessagerRole.Admin)
-                    itemToAdd.Client = (await _adminManager.FindByIdAsync(group.Key));
-                
-                else if(keyRole == MessagerRole.Patient)
-                    itemToAdd.Client = await _patientManager.FindByIdAsync(group.Key);
-                
-                else if (keyRole == MessagerRole.Doctor)
-                    itemToAdd.Client = await _doctorManager.FindByIdAsync(group.Key);
-            
                 foreach (var item in group)
                     itemToAdd.Messages.Add(item);
 
