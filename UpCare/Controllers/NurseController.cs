@@ -117,6 +117,17 @@ namespace UpCare.Controllers
             return Ok(nurses);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Nurse>> GetSpecificDoctor(string id)
+        {
+            var nurse = await _nurseManager.FindByIdAsync(id);
+
+            if (nurse is null)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            return Ok(nurse);
+        }
+
         [HttpPost("care/add")] // POST: /api/nurse/care/add
         public async Task<ActionResult<SucceededToAdd>> AddNurseCare(NurseCare model)
         {

@@ -112,23 +112,24 @@ namespace UpCare.Controllers
             });
         }
 
-
-        [HttpGet("receive")] // GET: /api/chat/receive?role={number}&id={string}
+        [HttpGet("receive/doctors")] // GET: /api/chat/receive?role={number}&id={string}
         public async Task<ActionResult<List<MessagePackage>>> GetMessages([FromQuery] MessagerRole role, [FromQuery] string id)
         {
             var list = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
-                                                               || (x.ReceiverId == id && x.ReceiverRole == role)))
-                                                    .Select(x => new MessageToReturnDto
-                                                    {
-                                                        Content = x.Content,
-                                                        DateTime = x.DateTime,
-                                                        ReceiverId = x.ReceiverId,
-                                                        SenderId = x.SenderId,
-                                                        ReceiverRole = x.ReceiverRole,
-                                                        SenderRole = x.SenderRole,
-                                                        isSent = (x.SenderId == id) ? true : false
-                                                    })
-                                                    .OrderByDescending(x => x.DateTime).ToListAsync();
+                                                    || (x.ReceiverId == id && x.ReceiverRole == role)))
+                                        .Select(x => new MessageToReturnDto
+                                        {
+                                            Content = x.Content,
+                                            DateTime = x.DateTime,
+                                            ReceiverId = x.ReceiverId,
+                                            SenderId = x.SenderId,
+                                            ReceiverRole = x.ReceiverRole,
+                                            SenderRole = x.SenderRole,
+                                            isSent = (x.SenderId == id) ? true : false
+                                        })
+                                        .OrderByDescending(x => x.DateTime)
+                                        .Where(x => (x.SenderId == id) ? x.ReceiverRole == MessagerRole.Doctor : x.SenderRole == MessagerRole.Doctor)
+                                        .ToListAsync();
 
             var groupedList = list.GroupBy(x => (id == x.SenderId) ? x.ReceiverId : x.SenderId);
 

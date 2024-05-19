@@ -109,6 +109,17 @@ namespace UpCare.Controllers
             return Ok(receptionists);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Receptionist>> GetSpecificDoctor(string id)
+        {
+            var doctor = await _userManager.FindByIdAsync(id);
+
+            if (doctor is null)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            return Ok(doctor);
+        }
+
         /*
          *      1. Rooms
          *      2. RoomsForPatients

@@ -115,6 +115,17 @@ namespace UpCare.Controllers
             return Ok(doctors);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Doctor>> GetSpecificDoctor(string id)
+        {
+            var doctor = await _userManager.FindByIdAsync(id);
+
+            if (doctor is null)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            return Ok(doctor);
+        }
+
         [HttpGet("specialities")] // GET: /api/doctor/specialities
         public async Task<ActionResult<List<string>>> GetSpecialities()
         {

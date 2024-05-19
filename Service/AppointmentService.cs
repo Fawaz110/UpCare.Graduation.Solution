@@ -4,6 +4,7 @@ using Core.UnitOfWork.Contract;
 using Core.UpCareEntities;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Stripe;
 
 namespace Repository
@@ -16,6 +17,7 @@ namespace Repository
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IOperationRepository _operationRepository;
+        private readonly IConfiguration _configuration;
 
         public AppointmentService(
             UserManager<Patient> patientManager,
@@ -23,7 +25,8 @@ namespace Repository
             IConsultationRepository consultationRepository,
             IUnitOfWork unitOfWork,
             IAppointmentRepository appointmentRepository,
-            IOperationRepository operationRepository)
+            IOperationRepository operationRepository,
+            IConfiguration configuration)
         {
             this._patientManager = patientManager;
             this._doctorManager = doctorManager;
@@ -31,6 +34,7 @@ namespace Repository
             _unitOfWork = unitOfWork;
             _appointmentRepository = appointmentRepository;
             _operationRepository = operationRepository;
+            _configuration = configuration;
         }
 
         public async Task<PatientAppointment> AddAppointmentAsync(PatientAppointment appointment)
@@ -47,6 +51,8 @@ namespace Repository
 
             if (!(await ConsultationTimeIsAvailable(appointment)))
                 return null;
+
+            StripeConfiguration.ApiKey = _configuration["StripeSettings:SecretKey"];
 
             PaymentIntentService paymentIntentService = new PaymentIntentService();
 
