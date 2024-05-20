@@ -5,13 +5,11 @@ namespace UpCare.DTOs.PatientDtos
 {
     public class AppointmentDto
     {
-        [Required]
-        public Core.UpCareUsers.Patient Patient { get; set; }
-        [Required]
-        public Core.UpCareUsers.Doctor Doctor { get; set; }
-        [Required]
         public DateTime DateTime { get; set; } = DateTime.UtcNow;
-        [Required]
         public AppointmentType Type { get; set; }
+        public string PaymentIntentId { get; set; }
+        public string ClientSecret { get; set; }
+        public Core.UpCareUsers.Patient Patient { get; set; }
+        public Core.UpCareUsers.Doctor Doctor { get; set; }
     }
 }
