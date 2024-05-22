@@ -164,6 +164,9 @@ namespace UpCare.Controllers
 
             var result = await _consultationService.GetByPatientIdAsync(id);
 
+            if (result.Count() == 0 || result is null)
+                return NotFound(new ApiResponse(404, "no data found"));
+
             var consultations = result.Where(x => x.DateTime > DateTime.UtcNow).ToList();
 
             if (consultations.Count() == 0)
