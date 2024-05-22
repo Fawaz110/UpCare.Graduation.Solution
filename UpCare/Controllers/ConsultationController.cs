@@ -41,6 +41,9 @@ namespace UpCare.Controllers
             var objectToReturn = new ConsultationDto
             {
                 DateTime = consultation.DateTime,
+                Type = result.Type,
+                PaymentIntentId = result.PaymentIntentId,
+                ClientSecret = result.ClientSecret,
                 Doctor = await _doctorManager.FindByIdAsync(consultation.FK_DoctorId),
                 Patient = await _patientManager.FindByIdAsync(consultation.FK_PatientId)
             };
