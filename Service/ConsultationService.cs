@@ -86,7 +86,8 @@ namespace Service
             }
 
             await _consultationRepository.AddConsultationAsync(patientConsultation);
-            await _unitOfWork.CompleteAsync();
+
+            var result = await _unitOfWork.CompleteAsync();
 
             return patientConsultation;
         }

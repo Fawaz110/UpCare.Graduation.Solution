@@ -4,6 +4,7 @@ using Core.Services.Contract;
 using Core.UnitOfWork.Contract;
 using Microsoft.AspNetCore.Identity;
 using Repository;
+using Repository.UpCareData;
 using Service;
 using UpCare.Helpers;
 
@@ -58,6 +59,7 @@ namespace UpCare.Extensions
             services.AddScoped(typeof(RoleManager<>));
             services.AddScoped<FireBaseServices>();
             services.AddScoped<IMediator, Mediator>();
+            //services.AddSingleton<UpCareDbContext>();
             services.AddControllers();
 
             services.AddSignalR();

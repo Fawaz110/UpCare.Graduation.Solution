@@ -86,7 +86,8 @@ namespace Repository
             }
 
             await _appointmentRepository.AddAppointmentAsync(appointment);
-            await _unitOfWork.CompleteAsync();
+
+            var result = await _unitOfWork.CompleteAsync();
 
             return appointment;
         }

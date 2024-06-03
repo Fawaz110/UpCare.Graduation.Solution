@@ -171,7 +171,7 @@ namespace UpCare.Controllers
                     {
                         Doctor = await _doctorManager.FindByIdAsync(appointment.FK_DoctorId),
                         DateTime = appointment.DateTime,
-                        Passed = (appointment.DateTime < DateTime.UtcNow.AddMinutes(-30)) ? false : true,
+                        Passed = (DateTime.UtcNow.AddMinutes(-30) > appointment.DateTime) ? true : false,
                         Type = appointment.Type.ToString()
                     };
 
@@ -186,7 +186,7 @@ namespace UpCare.Controllers
                 {
                     Doctor = await _doctorManager.FindByIdAsync(consultation.FK_DoctorId),
                     DateTime = consultation.DateTime,
-                    Passed = (consultation.DateTime < DateTime.UtcNow.AddMinutes(-30)) ? false : true,
+                    Passed = (DateTime.UtcNow.AddMinutes(-30) > consultation.DateTime) ? true : false,
                     Type = consultation.Type.ToString()
                 };
 
