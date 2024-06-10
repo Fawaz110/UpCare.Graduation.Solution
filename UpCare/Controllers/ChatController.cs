@@ -345,47 +345,42 @@ namespace UpCare.Controllers
                                             }).OrderByDescending(msg => msg.DateTime).ToListAsync();
 
             return Ok(messages);
-            //var list = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
-            //                                        || (x.ReceiverId == id && x.ReceiverRole == role)))
-            //                            .Select(x => new MessageToReturnDto
-            //                            {
-            //                                Content = x.Content,
-            //                                DateTime = x.DateTime,
-            //                                ReceiverId = x.ReceiverId,
-            //                                SenderId = x.SenderId,
-            //                                ReceiverRole = x.ReceiverRole,
-            //                                SenderRole = x.SenderRole,
-            //                                isSent = (x.SenderId == id) ? true : false
-            //                            })
-            //                            .OrderByDescending(x => x.DateTime)
-            //                            .Where(x => (x.SenderId == id) ? x.ReceiverRole == MessagerRole.Doctor
-            //                                                           : x.SenderRole == MessagerRole.Doctor)
-            //                            .ToListAsync();
 
-            // var groupedList = list.GroupBy(x => (id == x.SenderId) ? x.ReceiverId : x.SenderId).FirstOrDefault();
-
-            //var mappedToReturn = new List<MessagePackageToReturn>();
-
-            //foreach (var group in groupedList)
-            //{
-            //    var itemToAdd = new MessagePackageToReturn();
-
-            //    itemToAdd.ClientId = group.Key;
-
-            //    ///if (firstInGroup.SenderRole == role || firstInGroup.SenderId == id)
-            //    ///    keyRole = firstInGroup.ReceiverRole;
-            //    ///else
-            //    ///    keyRole = firstInGroup.SenderRole;
-
-            //    foreach (var item in group)
-            //        itemToAdd.Messages.Add(item);
-
-            //    itemToAdd.Messages.Reverse();
-
-            //    mappedToReturn.Add(itemToAdd);
-            //}
-            //if (groupedList is null)
-            //    return NotFound(new ApiResponse(404, "no messages found"));
+            ///var list = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
+            ///                                        || (x.ReceiverId == id && x.ReceiverRole == role)))
+            ///                            .Select(x => new MessageToReturnDto
+            ///                            {
+            ///                                Content = x.Content,
+            ///                                DateTime = x.DateTime,
+            ///                                ReceiverId = x.ReceiverId,
+            ///                                SenderId = x.SenderId,
+            ///                                ReceiverRole = x.ReceiverRole,
+            ///                                SenderRole = x.SenderRole,
+            ///                                isSent = (x.SenderId == id) ? true : false
+            ///                            })
+            ///                            .OrderByDescending(x => x.DateTime)
+            ///                            .Where(x => (x.SenderId == id) ? x.ReceiverRole == MessagerRole.Doctor
+            ///                                                           : x.SenderRole == MessagerRole.Doctor)
+            ///                            .ToListAsync();
+            
+            /// var groupedList = list.GroupBy(x => (id == x.SenderId) ? x.ReceiverId : x.SenderId).FirstOrDefault();
+            ///var mappedToReturn = new List<MessagePackageToReturn>();
+            ///foreach (var group in groupedList)
+            ///{
+            ///    var itemToAdd = new MessagePackageToReturn();
+            ///    itemToAdd.ClientId = group.Key;
+            ///    ///if (firstInGroup.SenderRole == role || firstInGroup.SenderId == id)
+            ///    ///    keyRole = firstInGroup.ReceiverRole;
+            ///    ///else
+            ///    ///    keyRole = firstInGroup.SenderRole;
+            
+            ///    foreach (var item in group)
+            ///        itemToAdd.Messages.Add(item);
+            ///    itemToAdd.Messages.Reverse();
+            ///    mappedToReturn.Add(itemToAdd);
+            ///}
+            ///if (groupedList is null)
+            ///    return NotFound(new ApiResponse(404, "no messages found"));
 
             ///var result = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
             ///                                           || (x.ReceiverId == id && x.ReceiverRole == role)))
@@ -414,23 +409,19 @@ namespace UpCare.Controllers
             if (role != MessagerRole.Patient)
                 return BadRequest(new ApiResponse(400, "request only allowed for patients"));
 
-            var list = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
-                                                    || (x.ReceiverId == id && x.ReceiverRole == role)))
-                                        .Select(x => new MessageToReturnDto
-                                        {
-                                            Content = x.Content,
-                                            DateTime = x.DateTime,
-                                            ReceiverId = x.ReceiverId,
-                                            SenderId = x.SenderId,
-                                            ReceiverRole = x.ReceiverRole,
-                                            SenderRole = x.SenderRole,
-                                            isSent = (x.SenderId == id) ? true : false
-                                        })
-                                        .OrderByDescending(x => x.DateTime)
-                                        .Where(x => (x.SenderId == id) ? x.ReceiverRole == MessagerRole.Admin : x.SenderRole == MessagerRole.Admin)
-                                        .ToListAsync();
+            var messages = await _context.Set<Message>().Where(m => (m.SenderId == id || m.ReceiverId == id))
+                                                        .Select(x => new MessageToReturnDto
+                                                                {
+                                                                    Content = x.Content,
+                                                                    DateTime = x.DateTime,
+                                                                    ReceiverId=x.ReceiverId,
+                                                                    SenderId = x.SenderId,
+                                                                    isSent = (x.SenderRole == MessagerRole.Patient)? true: false
+                                                                }).OrderBy(x => x.DateTime).ToListAsync();
 
-            var groupedList = list.GroupBy(x => (id == x.SenderId) ? x.ReceiverId : x.SenderId);
+            
+
+            var groupedList = messages.GroupBy(x => (id == x.SenderId) ? x.ReceiverId : x.SenderId);
 
             var mappedToReturn = new List<MessagePackageToReturn>();
 
@@ -439,11 +430,6 @@ namespace UpCare.Controllers
                 var itemToAdd = new MessagePackageToReturn();
 
                 itemToAdd.ClientId = group.Key;
-
-                ///if (firstInGroup.SenderRole == role || firstInGroup.SenderId == id)
-                ///    keyRole = firstInGroup.ReceiverRole;
-                ///else
-                ///    keyRole = firstInGroup.SenderRole;
 
                 foreach (var item in group)
                     itemToAdd.Messages.Add(item);
@@ -455,6 +441,22 @@ namespace UpCare.Controllers
 
             return Ok(mappedToReturn);
 
+            ///var list = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
+            ///                                        || (x.ReceiverId == id && x.ReceiverRole == role)))
+            ///                            .Select(x => new MessageToReturnDto
+            ///                            {
+            ///                                Content = x.Content,
+            ///                                DateTime = x.DateTime,
+            ///                                ReceiverId = x.ReceiverId,
+            ///                                SenderId = x.SenderId,
+            ///                                ReceiverRole = x.ReceiverRole,
+            ///                                SenderRole = x.SenderRole,
+            ///                                isSent = (x.SenderId == id) ? true : false
+            ///                            })
+            ///                            .OrderByDescending(x => x.DateTime)
+            ///                            .Where(x => (x.SenderId == id) ? x.ReceiverRole == MessagerRole.Admin : x.SenderRole == MessagerRole.Admin)
+            ///                            .ToListAsync(); 
+            
             ///var result = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
             ///                                           || (x.ReceiverId == id && x.ReceiverRole == role)))
             ///                                  .OrderByDescending(x => x.DateTime).ToListAsync();
@@ -471,6 +473,88 @@ namespace UpCare.Controllers
             ///return Ok(mapped); 
         }
 
+        [HttpGet("patient/receive/doctor/{doctorId}")] // GET: /api/chat/patient/receive/doctor/{doctorId}?role=1&id={string}
+        public async Task<ActionResult<List<MessageToReturnDto>>> GetSpecificDoctorMessages([FromQuery] string id, string doctorId, [FromQuery] MessagerRole? role = MessagerRole.Doctor)
+        {
+            var patient = await _patientManager.FindByIdAsync(id);
+
+            if (patient is null)
+                return Unauthorized(new ApiResponse(401, "unauthorized access"));
+
+            if (role != MessagerRole.Patient)
+                return BadRequest(new ApiResponse(400, "request only allowed for patients"));
+
+            var doctor = await _patientManager.FindByIdAsync(doctorId);
+
+            if (doctor is null)
+                return NotFound(new ApiResponse(404, "there is no doctor matches"));
+
+            var messages = await _context.Messages.Where(msg => (msg.SenderId == doctorId && msg.ReceiverId == id)
+                                                       || (msg.ReceiverId == doctorId && msg.SenderId == id))
+                                            .Select(msg => new MessageToReturnDto
+                                            {
+                                                Content = msg.Content,
+                                                SenderId = msg.SenderId,
+                                                ReceiverId = msg.ReceiverId,
+                                                DateTime = msg.DateTime,
+                                                ReceiverRole = msg.ReceiverRole,
+                                                SenderRole = msg.SenderRole,
+                                                isSent = (msg.SenderId == id) ? true : false
+                                            }).OrderByDescending(msg => msg.DateTime).ToListAsync();
+
+            return Ok(messages);
+
+            ///var list = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
+            ///                                        || (x.ReceiverId == id && x.ReceiverRole == role)))
+            ///                            .Select(x => new MessageToReturnDto
+            ///                            {
+            ///                                Content = x.Content,
+            ///                                DateTime = x.DateTime,
+            ///                                ReceiverId = x.ReceiverId,
+            ///                                SenderId = x.SenderId,
+            ///                                ReceiverRole = x.ReceiverRole,
+            ///                                SenderRole = x.SenderRole,
+            ///                                isSent = (x.SenderId == id) ? true : false
+            ///                            })
+            ///                            .OrderByDescending(x => x.DateTime)
+            ///                            .Where(x => (x.SenderId == id) ? x.ReceiverRole == MessagerRole.Doctor
+            ///                                                           : x.SenderRole == MessagerRole.Doctor)
+            ///                            .ToListAsync();
+
+            /// var groupedList = list.GroupBy(x => (id == x.SenderId) ? x.ReceiverId : x.SenderId).FirstOrDefault();
+            ///var mappedToReturn = new List<MessagePackageToReturn>();
+            ///foreach (var group in groupedList)
+            ///{
+            ///    var itemToAdd = new MessagePackageToReturn();
+            ///    itemToAdd.ClientId = group.Key;
+            ///    ///if (firstInGroup.SenderRole == role || firstInGroup.SenderId == id)
+            ///    ///    keyRole = firstInGroup.ReceiverRole;
+            ///    ///else
+            ///    ///    keyRole = firstInGroup.SenderRole;
+
+            ///    foreach (var item in group)
+            ///        itemToAdd.Messages.Add(item);
+            ///    itemToAdd.Messages.Reverse();
+            ///    mappedToReturn.Add(itemToAdd);
+            ///}
+            ///if (groupedList is null)
+            ///    return NotFound(new ApiResponse(404, "no messages found"));
+
+            ///var result = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.SenderRole == role)
+            ///                                           || (x.ReceiverId == id && x.ReceiverRole == role)))
+            ///                                  .OrderByDescending(x => x.DateTime).ToListAsync();
+            ///if (result.Count() == 0)
+            ///    return NotFound(new ApiResponse(404, "no data found"));
+            ///var grouped = result.GroupBy(x => (id == x.SenderId) ? x.ReceiverId : x.SenderId);
+            ///var mapped = new List<MessagePackage>();
+            ///foreach (var group in grouped)
+            ///{
+            ///    var package = new MessagePackage { Id = group.Key };
+            ///    foreach (var item in group)
+            ///        package.Messages.Add(item);
+            ///}
+            ///return Ok(mapped); 
+        }
 
         //[HttpPost("from-admin/to-doctor")] // POST: /api/chat/from-admin/to-doctor
         //public async Task<ActionResult<SucceededToAdd>> SendFromAdminToDoctor([FromBody] Message model)

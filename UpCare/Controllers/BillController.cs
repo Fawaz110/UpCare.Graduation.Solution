@@ -149,7 +149,6 @@ namespace UpCare.Controllers
 
                 mapped.Add(mappedItem);
             }
-
             return mapped;
         }
 
