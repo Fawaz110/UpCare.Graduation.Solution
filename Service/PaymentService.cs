@@ -28,7 +28,7 @@ namespace Service
             _prescriptionService = prescriptionService;
             _billService = billService;
         }
-        public async Task<Prescription> CreateOrUpdatePaymentIntent(int prescriptionId, Payment payment)
+        public async Task<Prescription> CreateOrUpdatePaymentIntent(int prescriptionId, PrescriptionPayment payment)
         {
             StripeConfiguration.ApiKey = _configuration["StripeSettings:SecretKey"];
 
@@ -36,23 +36,32 @@ namespace Service
 
             if (prescription is null) return null;
 
+            var bill = new Bill
+            {
+                DeliveredService = "prescription",
+                FK_PayorId = prescription.FK_PatientId,
+            };
+
+            var medicineForBill = new List<MedicineInPrescription>();
+            var radiologyForBill = new List<RadiologyInPrescription>();
+            var checkupForBill = new List<CheckupInPrescription>();
+
             PaymentIntentService paymentIntentService = new PaymentIntentService();
 
             PaymentIntent paymentintent;
 
-            if(payment == Payment.All)
+            if(payment == PrescriptionPayment.All)
             {
                 if (string.IsNullOrEmpty(prescription.PrescriptionPaymentIntentId)) // Create Prescription PaymentIntent
                 {
-
                     #region Get Medicine Total Price
                     decimal medicineTotalPrice = 0m;
 
                     if (string.IsNullOrEmpty(prescription.MedicinePaymentIntentId))
                     {
-                        var medicineInPrescription = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
+                        medicineForBill = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in medicineInPrescription)
+                        foreach (var item in medicineForBill)
                         {
                             var medicine = await _unitOfWork.Repository<Medicine>().GetByIdAsync(item.FK_MedicineId);
 
@@ -66,9 +75,9 @@ namespace Service
 
                     if (string.IsNullOrEmpty(prescription.RadiologyPaymentIntentId))
                     {
-                        var radiologyInPrescription = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
+                        radiologyForBill = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in radiologyInPrescription)
+                        foreach (var item in radiologyForBill)
                         {
                             var radiology = await _unitOfWork.Repository<Radiology>().GetByIdAsync(item.FK_RadiologyId);
 
@@ -82,9 +91,9 @@ namespace Service
 
                     if (string.IsNullOrEmpty(prescription.CheckupPaymentIntentId))
                     {
-                        var checkupInPrescription = await _prescriptionService.GetCheckupByPrescriptionIdAsync(prescriptionId);
+                        checkupForBill = await _prescriptionService.GetCheckupByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in checkupInPrescription)
+                        foreach (var item in checkupForBill)
                         {
                             var checkup = await _unitOfWork.Repository<Checkup>().GetByIdAsync(item.FK_CheckupId);
 
@@ -105,6 +114,9 @@ namespace Service
                         paymentintent = await paymentIntentService.CreateAsync(createOptions); // Integrate With Stripe
                         prescription.PrescriptionPaymentIntentId = paymentintent.Id;
                         prescription.PrescriptionClientSecret = paymentintent.ClientSecret;
+                        bill.PaidMoney = (decimal)(createOptions.Amount / 100);
+                        bill.PaymentIntentId = paymentintent.Id;
+                        bill.ClientSecret = paymentintent.ClientSecret;
                     }
                 }
                 else // Update Existing PrescriptionPaymentIntent
@@ -115,9 +127,9 @@ namespace Service
 
                     if (string.IsNullOrEmpty(prescription.MedicinePaymentIntentId))
                     {
-                        var medicineInPrescription = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
+                        medicineForBill = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in medicineInPrescription)
+                        foreach (var item in medicineForBill)
                         {
                             var medicine = await _unitOfWork.Repository<Medicine>().GetByIdAsync(item.FK_MedicineId);
 
@@ -131,9 +143,9 @@ namespace Service
 
                     if (string.IsNullOrEmpty(prescription.RadiologyPaymentIntentId))
                     {
-                        var radiologyInPrescription = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
+                        radiologyForBill = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in radiologyInPrescription)
+                        foreach (var item in radiologyForBill)
                         {
                             var radiology = await _unitOfWork.Repository<Radiology>().GetByIdAsync(item.FK_RadiologyId);
 
@@ -147,9 +159,9 @@ namespace Service
 
                     if (string.IsNullOrEmpty(prescription.CheckupPaymentIntentId))
                     {
-                        var checkupInPrescription = await _prescriptionService.GetCheckupByPrescriptionIdAsync(prescriptionId);
+                        checkupForBill = await _prescriptionService.GetCheckupByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in checkupInPrescription)
+                        foreach (var item in checkupForBill)
                         {
                             var checkup = await _unitOfWork.Repository<Checkup>().GetByIdAsync(item.FK_CheckupId);
 
@@ -165,21 +177,19 @@ namespace Service
 
                     await paymentIntentService.UpdateAsync(prescription.PrescriptionPaymentIntentId, updateOptions);
                 }
-
             }
-            else if(payment == Payment.Medicine)
+            else if(payment == PrescriptionPayment.Medicine)
             {
                 if (string.IsNullOrEmpty(prescription.PrescriptionPaymentIntentId))
                 {
                     if (string.IsNullOrEmpty(prescription.MedicinePaymentIntentId)) // Create Medicine PaymentIntent
                     {
-
                         #region Get Medicine Total Price
                         decimal medicineTotalPrice = 0m;
 
-                        var medicineInPrescription = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
+                        medicineForBill = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in medicineInPrescription)
+                        foreach (var item in medicineForBill)
                         {
                             var medicine = await _unitOfWork.Repository<Medicine>().GetByIdAsync(item.FK_MedicineId);
 
@@ -196,9 +206,11 @@ namespace Service
                         if(createOptions.Amount > 0)
                         {
                             paymentintent = await paymentIntentService.CreateAsync(createOptions); // Integrate With Stripe
-
                             prescription.MedicinePaymentIntentId = paymentintent.Id;
                             prescription.MedicineClientSecret = paymentintent.ClientSecret;
+                            bill.PaymentIntentId = paymentintent.Id;
+                            bill.ClientSecret = paymentintent.ClientSecret;
+                            bill.PaidMoney = (decimal)(createOptions.Amount / 100);
                         }
                     }
                     else // Update Existing MedicinePaymentIntent
@@ -207,9 +219,9 @@ namespace Service
                         #region Get Medicine Total Price
                         decimal medicineTotalPrice = 0m;
 
-                        var medicineInPrescription = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
+                        medicineForBill = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in medicineInPrescription)
+                        foreach (var item in medicineForBill)
                         {
                             var medicine = await _unitOfWork.Repository<Medicine>().GetByIdAsync(item.FK_MedicineId);
 
@@ -223,10 +235,11 @@ namespace Service
                         };
 
                         await paymentIntentService.UpdateAsync(prescription.MedicinePaymentIntentId, updateOptions);
+                        bill.PaidMoney = (decimal)(updateOptions.Amount / 100);
                     }
                 }
             }
-            else if(payment == Payment.Radiology)
+            else if(payment == PrescriptionPayment.Radiology)
             {
                 if (string.IsNullOrEmpty(prescription.PrescriptionPaymentIntentId))
                 {
@@ -236,9 +249,9 @@ namespace Service
                         #region Get Radiology Total Price
                         decimal radiologyTotalPrice = 0m;
 
-                        var radiologyInPrescription = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
+                        radiologyForBill = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in radiologyInPrescription)
+                        foreach (var item in radiologyForBill)
                         {
                             var radiology = await _unitOfWork.Repository<Radiology>().GetByIdAsync(item.FK_RadiologyId);
 
@@ -258,6 +271,9 @@ namespace Service
                             paymentintent = await paymentIntentService.CreateAsync(createOptions); // Integrate With Stripe
                             prescription.RadiologyPaymentIntentId = paymentintent.Id;
                             prescription.RadiologyClientSecret = paymentintent.ClientSecret;
+                            bill.PaymentIntentId = paymentintent.Id;
+                            bill.ClientSecret = paymentintent.ClientSecret;
+                            bill.PaidMoney = (decimal)(createOptions.Amount / 100);
                         }
                     }
                     else // Update Existing RadiologyPaymentIntent
@@ -265,9 +281,9 @@ namespace Service
                         #region Get Radiology Total Price
                         decimal radiologyTotalPrice = 0m;
 
-                        var radiologyInPrescription = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
+                        radiologyForBill = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in radiologyInPrescription)
+                        foreach (var item in radiologyForBill)
                         {
                             var radiology = await _unitOfWork.Repository<Radiology>().GetByIdAsync(item.FK_RadiologyId);
 
@@ -281,11 +297,12 @@ namespace Service
                         };
 
                         await paymentIntentService.UpdateAsync(prescription.RadiologyPaymentIntentId, updateOptions);
+                        bill.PaidMoney = (decimal)(updateOptions.Amount / 100);
                     }
 
                 }
             }
-            else if(payment == Payment.Checkup)
+            else if(payment == PrescriptionPayment.Checkup)
             {
                 if (string.IsNullOrEmpty(prescription.PrescriptionPaymentIntentId))
                 {
@@ -295,9 +312,9 @@ namespace Service
                         #region Get Checkup Total Price
                         decimal checkupTotalPrice = 0m;
 
-                        var checkupInPrescription = await _prescriptionService.GetCheckupByPrescriptionIdAsync(prescriptionId);
+                        checkupForBill = await _prescriptionService.GetCheckupByPrescriptionIdAsync(prescriptionId);
 
-                        foreach (var item in checkupInPrescription)
+                        foreach (var item in checkupForBill)
                         {
                             var checkup = await _unitOfWork.Repository<Checkup>().GetByIdAsync(item.FK_CheckupId);
 
@@ -317,6 +334,9 @@ namespace Service
                             paymentintent = await paymentIntentService.CreateAsync(createOptions); // Integrate With Stripe
                             prescription.CheckupPaymentIntentId = paymentintent.Id;
                             prescription.CheckupClientSecret = paymentintent.ClientSecret;
+                            bill.PaymentIntentId = paymentintent.Id;
+                            bill.ClientSecret = paymentintent.ClientSecret;
+                            bill.PaidMoney = (decimal)(createOptions.Amount / 100);
                         }
                     }
                     else // Update Existing RadiologyPaymentIntent
@@ -340,10 +360,13 @@ namespace Service
                         };
 
                         await paymentIntentService.UpdateAsync(prescription.CheckupPaymentIntentId, updateOptions);
+                        bill.PaidMoney = (decimal)(updateOptions.Amount / 100);
                     }
                 }
             }
 
+
+            await _billService.AddAsync(bill, medicineForBill, checkupForBill, radiologyForBill);
 
             _unitOfWork.Repository<Prescription>().Update(prescription);
 
@@ -352,8 +375,48 @@ namespace Service
             return (result <= 0)? null : prescription;
         }
 
+        public async Task<Bill> CreateOrUpdatePaymentIntent(Bill bill)
+        {
+            StripeConfiguration.ApiKey = _configuration["StripeSettings:SecretKey"];
+
+            PaymentIntentService paymentIntentService = new PaymentIntentService();
+
+            PaymentIntent paymentIntent;
+
+            if (string.IsNullOrEmpty(bill.PaymentIntentId)) // Create PaymentIntent
+            {
+                PaymentIntentCreateOptions options = new PaymentIntentCreateOptions()
+                {
+                    Amount = (long)(bill.PaidMoney * 100),
+                    Currency = "usd",
+                    PaymentMethodTypes = new List<string>() { "card" }
+                };
+
+                paymentIntent = await paymentIntentService.CreateAsync(options);
+                bill.PaymentIntentId = paymentIntent.Id;
+                bill.ClientSecret = paymentIntent.ClientSecret;
+            } // Create PaymentIntent
+            else // Update PaymentIntent
+            {
+                PaymentIntentUpdateOptions options = new PaymentIntentUpdateOptions()
+                {
+                    Amount = (long)(bill.PaidMoney * 100)
+                };
+
+                await paymentIntentService.UpdateAsync(bill.PaymentIntentId, options);
+            } // Update PaymentIntent
+
+            await _unitOfWork.Repository<Bill>().Add(bill);
+
+            var result = await _unitOfWork.CompleteAsync();
+
+            if (result <= 0)
+                return null;
+
+            return bill;
+        }
+
         public async Task<Bill> UpdatePaymentIntentToSucceededOrFailed(string paymentIntentId, bool isSucceeded)
             => await _billService.GetWithPaymentIntent(paymentIntentId);
-        
     }
 }

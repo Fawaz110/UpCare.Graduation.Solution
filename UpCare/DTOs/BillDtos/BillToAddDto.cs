@@ -10,7 +10,7 @@ namespace UpCare.DTOs.BillDtos
         public string DeliveredService { get; set; }
         public string PaymentIntentId { get; set; }
         public int PrescriptionId { get; set; }
-        public Payment Payment { get; set; }
+        public PrescriptionPayment PrescriptionPayment { get; set; }
         public DateTime DateTime { get; set; } = DateTime.UtcNow;
     }
 }

@@ -191,6 +191,32 @@ namespace UpCare.Controllers
             ///return Ok(mapped); 
         }
 
+        [HttpGet("admin/receive/doctor/{doctorId}")] // GET: /api/chat/admin/receive/doctor/{doctorId}?id={string}&role={int}
+        public async Task<ActionResult<List<MessageToReturnDto>>> GetMessagesForSpecificDoctor([FromQuery] string id,[FromQuery] MessagerRole? role = MessagerRole.Admin)
+        {
+            var admin = await _adminManager.FindByIdAsync(id);
+
+            if (admin is null)
+                return Unauthorized(new ApiResponse(401, "unauthorized access"));
+
+            if (role != MessagerRole.Admin)
+                return BadRequest(new ApiResponse(400, "request only allowed for admins"));
+
+            var messages = await _context.Set<Message>().Where(x => (x.SenderId == id || x.ReceiverId == id))
+                                                        .Select(x => new MessageToReturnDto
+                                                        {
+                                                            Content = x.Content,
+                                                            DateTime = x.DateTime,
+                                                            ReceiverId = x.ReceiverId,
+                                                            ReceiverRole = x.ReceiverRole,
+                                                            SenderId = x.SenderId,
+                                                            SenderRole = x.SenderRole,
+                                                            isSent = (x.SenderId == id) ? true : false
+                                                        }).OrderByDescending(x => x.DateTime).ToListAsync();
+
+            return Ok(messages);
+        }
+
         [HttpGet("doctor/receive/admins")] // GET: /api/chat/receive?role={number}&id={string}
         public async Task<ActionResult<List<MessagePackage>>> GetAdminsMessages([FromQuery] string id, [FromQuery] MessagerRole? role = MessagerRole.Doctor)
         {

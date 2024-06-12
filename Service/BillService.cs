@@ -85,6 +85,17 @@ namespace Service
             return bill;
         }
 
+        public async Task<Bill> AddAsync(Bill bill)
+        {
+            await _unitOfWork.Repository<Bill>().Add(bill);
+
+            var result = await _unitOfWork.CompleteAsync();
+
+            if (result <= 0) return null;
+
+            return bill;
+        }
+
         public async Task<List<Checkup>> GetCheckupInBillAsync(int billId)
             => await _billRepository.GetCheckupByBillId(billId);
 

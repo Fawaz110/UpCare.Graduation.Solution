@@ -8,6 +8,7 @@ namespace Core.Services.Contract
     public interface IBillService
     {
         Task<Bill> AddAsync(Bill bill, List<MedicineInPrescription> medicineInPrescriptions, List<CheckupInPrescription> checkupInPrescriptions, List<RadiologyInPrescription> radiologyInPrescriptions);
+        Task<Bill> AddAsync(Bill bill);
         Task<Bill> GetWithPaymentIntent(string paymentIntentId);
         Task<List<Medicine>> GetMedicineInBillAsync(int billId);
         Task<List<Radiology>> GetRadiologiesInBillAsync(int billId);

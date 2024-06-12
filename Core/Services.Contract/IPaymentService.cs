@@ -3,7 +3,7 @@ using Core.UpCareEntities.PrescriptionEntities;
 
 namespace Core.Services.Contract
 {
-    public enum Payment
+    public enum PrescriptionPayment
     {
         Medicine, 
         Radiology, 
@@ -12,7 +12,8 @@ namespace Core.Services.Contract
     }
     public interface IPaymentService
     {
-        Task<Prescription> CreateOrUpdatePaymentIntent(int prescriptionId, Payment payment);
+        Task<Prescription> CreateOrUpdatePaymentIntent(int prescriptionId, PrescriptionPayment payment);
+        Task<Bill> CreateOrUpdatePaymentIntent(Bill bill);
         Task<Bill> UpdatePaymentIntentToSucceededOrFailed(string paymentIntentId, bool isSucceeded);
     }
 }

@@ -34,7 +34,7 @@ namespace UpCare.Controllers
         }
 
         [HttpGet("all")] // GET: /api/bill/all?patientId={string}
-        public async Task<ActionResult<List<Bill>>> GetAllBills(string? patientId)
+        public async Task<ActionResult<List<BillDto>>> GetAllBills(string? patientId)
         {
             var result = await _unitOfWork.Repository<Bill>().GetAllAsync();
 
@@ -56,58 +56,77 @@ namespace UpCare.Controllers
             return Ok(mapped);
         }
 
-        [HttpPost("add")] // POST: /api/bill/add
-        public async Task<ActionResult<SucceededToAdd>> AddBill(BillToAddDto model)
+        [HttpGet("{id}")] // GET: /api/bill/{id}
+        public async Task<ActionResult<BillDto>> GetSpecificBill(int id)
         {
-            var patient = _patientManager.FindByIdAsync(model.FK_PayorId);
+            var bill = await _unitOfWork.Repository<Bill>().GetByIdAsync(id);
 
-            if (patient is null)
-                return BadRequest(new ApiResponse(400, "invalid data entered"));
+            if (bill is null)
+                return NotFound(new ApiResponse(404, "no data matches found"));
 
-            var prescription = await _unitOfWork.Repository<Prescription>().GetByIdAsync(model.PrescriptionId);
+            var mapped = await MapToBillDto(bill);
 
-            if (prescription is null)
-                return BadRequest(new ApiResponse(400, "error occured with prescription"));
-
-            var bill = new Bill
-            {
-                DateTime = model.DateTime,
-                DeliveredService = model.DeliveredService,
-                FK_PayorId = model.FK_PayorId,
-                PaymentIntentId = model.PaymentIntentId,
-                PaidMoney = await CalcPaidMoney(model.PrescriptionId, model.Payment)
-            };
-
-            // Cont.. Form Here
-            // Get Medicine, Radiologies, Checkups depends on BillToAddDto.Payment
-            #region Get Related Data To Bill Depends On Payment Sent
-
-            var medicineList = new List<MedicineInPrescription>();
-            var checkupList = new List<CheckupInPrescription>();
-            var radiologyList = new List<RadiologyInPrescription>();
-
-            if (model.Payment == Payment.All || model.Payment == Payment.Medicine)
-                medicineList = await _prescriptionService.GetMedicineByPrescriptionIdAsync(model.PrescriptionId);
-
-            if (model.Payment == Payment.All || model.Payment == Payment.Checkup)
-                checkupList = await _prescriptionService.GetCheckupByPrescriptionIdAsync(model.PrescriptionId);
-
-            if (model.Payment == Payment.All || model.Payment == Payment.Radiology)
-                radiologyList = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(model.PrescriptionId);
-
-            #endregion
-
-            var result = await _billService.AddAsync(bill, medicineList, checkupList, radiologyList);
-
-            if (result is null)
-                return BadRequest(new ApiResponse(400, "an error occured during adding data"));
-
-            return Ok(new SucceededToAdd
-            {
-                Message = "success",
-                Data = await MapToBillDto(result)
-            });
+            return Ok(mapped);
         }
+
+        //[HttpPost("add")] // POST: /api/bill/add
+        //public async Task<ActionResult<SucceededToAdd>> AddPrescriptionBill(BillToAddDto model)
+        //{
+        //    var patient = _patientManager.FindByIdAsync(model.FK_PayorId);
+
+        //    if (patient is null)
+        //        return BadRequest(new ApiResponse(400, "invalid data entered"));
+
+        //    var prescription = await _unitOfWork.Repository<Prescription>().GetByIdAsync(model.PrescriptionId);
+
+        //    if (prescription is null)
+        //        return BadRequest(new ApiResponse(400, "error occured with prescription"));
+
+        //    var bill = new Bill
+        //    {
+        //        DateTime = model.DateTime,
+        //        DeliveredService = model.DeliveredService,
+        //        FK_PayorId = model.FK_PayorId,
+        //        PaymentIntentId = model.PaymentIntentId,
+        //        PaidMoney = await CalcPaidMoney(model.PrescriptionId, model.PrescriptionPayment)
+        //    };
+
+        //    // Cont.. Form Here
+        //    // Get Medicine, Radiologies, Checkups depends on BillToAddDto.Payment
+        //    #region Get Related Data To Bill Depends On Payment Sent
+
+        //    var medicineList = new List<MedicineInPrescription>();
+        //    var checkupList = new List<CheckupInPrescription>();
+        //    var radiologyList = new List<RadiologyInPrescription>();
+
+        //    if (model.PrescriptionPayment == PrescriptionPayment.All || model.PrescriptionPayment == PrescriptionPayment.Medicine)
+        //        medicineList = await _prescriptionService.GetMedicineByPrescriptionIdAsync(model.PrescriptionId);
+
+        //    if (model.PrescriptionPayment == PrescriptionPayment.All || model.PrescriptionPayment == PrescriptionPayment.Checkup)
+        //        checkupList = await _prescriptionService.GetCheckupByPrescriptionIdAsync(model.PrescriptionId);
+
+        //    if (model.PrescriptionPayment == PrescriptionPayment.All || model.PrescriptionPayment == PrescriptionPayment.Radiology)
+        //        radiologyList = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(model.PrescriptionId);
+
+        //    #endregion
+
+        //    var result = await _billService.AddAsync(bill, medicineList, checkupList, radiologyList);
+
+        //    if (result is null)
+        //        return BadRequest(new ApiResponse(400, "an error occured during adding data"));
+
+        //    return Ok(new SucceededToAdd
+        //    {
+        //        Message = "success",
+        //        Data = await MapToBillDto(result)
+        //    });
+        //}
+
+        //[HttpPost("add")] // POST: /api/bill/add
+        //public async Task<ActionResult<SucceededToAdd>> AddReservastionBill()
+        //{
+
+        //}
 
         [HttpGet] // GET: /api/bill?searchTerm=
         public async Task<ActionResult<List<BillDto>>> Search([FromQuery]string? searchTerm)
@@ -161,14 +180,17 @@ namespace UpCare.Controllers
                 Payor = await _patientManager.FindByIdAsync(data.FK_PayorId),
                 Medicines = await _billService.GetMedicineInBillAsync(data.Id),
                 Checkups = await _billService.GetCheckupInBillAsync(data.Id),
-                Radiologies = await _billService.GetRadiologiesInBillAsync(data.Id)
+                Radiologies = await _billService.GetRadiologiesInBillAsync(data.Id),
+                Id = data.Id, 
+                ClientSecret = data.ClientSecret,
+                PaymentIntentId = data.PaymentIntentId,
             };
         
-        private async Task<decimal> CalcPaidMoney(int prescriptionId, Payment payment)
+        private async Task<decimal> CalcPaidMoney(int prescriptionId, PrescriptionPayment? payment)
         {
             var totalPaid = 0m;
 
-            if(payment == Payment.All)
+            if(payment == PrescriptionPayment.All)
             {
                 #region Calc Medicine Total Price
                 var medicineList = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
@@ -203,7 +225,7 @@ namespace UpCare.Controllers
                 } 
                 #endregion
             }
-            else if (payment == Payment.Medicine)
+            else if (payment == PrescriptionPayment.Medicine)
             {
                 #region Calc Medicine Total Price
                 var medicineList = await _prescriptionService.GetMedicineByPrescriptionIdAsync(prescriptionId);
@@ -216,7 +238,7 @@ namespace UpCare.Controllers
                 }
                 #endregion
             }
-            else if (payment == Payment.Radiology)
+            else if (payment == PrescriptionPayment.Radiology)
             {
                 #region Calc Radiology Total Price
                 var radiologyList = await _prescriptionService.GetRadiologyByPrescriptionIdAsync(prescriptionId);
@@ -229,7 +251,7 @@ namespace UpCare.Controllers
                 }
                 #endregion
             }
-            else if (payment == Payment.Checkup)
+            else if (payment == PrescriptionPayment.Checkup)
             {
                 #region Calc Checkup Total Price
                 var checkupList = await _prescriptionService.GetCheckupByPrescriptionIdAsync(prescriptionId);
