@@ -39,6 +39,8 @@ namespace UpCare.Controllers
             {
                 DateTime = result.DateTime,
                 Type = result.Type,
+                ClientSecret = result.ClientSecret,
+                PaymentIntentId = result.PaymentIntentId,
                 Doctor = await _doctorManager.FindByIdAsync(patientAppointment.FK_DoctorId),
                 Patient = await _patientManager.FindByIdAsync(patientAppointment.FK_PatientId)
             };

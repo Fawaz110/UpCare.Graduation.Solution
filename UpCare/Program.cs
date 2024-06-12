@@ -161,6 +161,13 @@ namespace UpCare
             });
             #endregion
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("MyPolicy", options => {
+                    options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                });
+            });
+
             var app = builder.Build();
 
 
@@ -186,10 +193,13 @@ namespace UpCare
                 app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
+                    endpoints.MapHub<ChatHub>("/chat");
                 });
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("MyPolicy");
 
             app.UseAuthentication();
 

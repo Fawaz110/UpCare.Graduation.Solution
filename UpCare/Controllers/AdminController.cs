@@ -38,6 +38,7 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
@@ -45,6 +46,17 @@ namespace UpCare.Controllers
                 Token = await _authServices.CreateTokenAsync(user, _userManager),
                 UserRole = "admin"
             });
+        }
+
+        [HttpGet("{id}")] // GET: /api/admin/{id}
+        public async Task<ActionResult<Admin>> GetSpecificAdmin(string id)
+        {
+            var admin = await _userManager.FindByIdAsync(id);
+
+            if (admin is null)
+                return NotFound(new ApiResponse(404, "no data matches found"));
+
+            return Ok(admin);
         }
 
         /*

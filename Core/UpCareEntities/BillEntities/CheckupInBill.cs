@@ -10,6 +10,5 @@ namespace Core.UpCareEntities.BillEntities
     {
         public int FK_BillId { get; set; }
         public int FK_CheckupId { get; set; }
-        public decimal Price { get; set; }
     }
 }

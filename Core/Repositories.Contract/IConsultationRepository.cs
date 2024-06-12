@@ -11,5 +11,6 @@ namespace Core.Repositories.Contract
         Task AddConsultationAsync(PatientConsultation patientConsultation);
         void DeleteAsync(PatientConsultation patientConsultation);
         Task<PatientConsultation> GetWithSpec(PatientConsultation consultation);
+        Task<List<PatientConsultation>> GetAllAsync();
     }
 }

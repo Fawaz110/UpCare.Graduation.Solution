@@ -126,6 +126,10 @@ namespace Repository.UpCareData.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("ClientSecret")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
@@ -133,8 +137,16 @@ namespace Repository.UpCareData.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FK_PayorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PaidMoney")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PaymentIntentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -148,9 +160,6 @@ namespace Repository.UpCareData.Migrations
 
                     b.Property<int>("FK_BillId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("FK_CheckupId", "FK_BillId");
 
@@ -298,9 +307,15 @@ namespace Repository.UpCareData.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ReceiverRole")
+                        .HasColumnType("int");
+
                     b.Property<string>("SenderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SenderRole")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -312,8 +327,8 @@ namespace Repository.UpCareData.Migrations
                     b.Property<string>("FK_NurseId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("FK_RoomId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("FK_RoomId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FK_PatientId")
                         .HasColumnType("nvarchar(450)");
@@ -321,11 +336,17 @@ namespace Repository.UpCareData.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("BeatPerMinute")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("BloodPresure")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Notes")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OxygenSaturation")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Suger")
@@ -346,6 +367,14 @@ namespace Repository.UpCareData.Migrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ClientSecret")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentIntentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
@@ -391,6 +420,14 @@ namespace Repository.UpCareData.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ClientSecret")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentIntentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
@@ -410,22 +447,6 @@ namespace Repository.UpCareData.Migrations
                     b.HasKey("FK_CheckupId", "FK_PrescriptionId");
 
                     b.ToTable("CheckupInPrescriptions");
-                });
-
-            modelBuilder.Entity("Core.UpCareEntities.PrescriptionEntities.DoctorGivePrescription", b =>
-                {
-                    b.Property<string>("FK_PatientId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("FK_PrescriptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("FK_DoctorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("FK_PatientId", "FK_PrescriptionId", "FK_DoctorId");
-
-                    b.ToTable("DoctorGivePrescriptions");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PrescriptionEntities.MedicineInPrescription", b =>
@@ -453,6 +474,12 @@ namespace Repository.UpCareData.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CheckupClientSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CheckupPaymentIntentId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
@@ -462,6 +489,32 @@ namespace Repository.UpCareData.Migrations
 
                     b.Property<string>("Diagnosis")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FK_DoctorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FK_PatientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicineClientSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicinePaymentIntentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrescriptionClientSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrescriptionPaymentIntentId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RadiologyClientSecret")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RadiologyPaymentIntentId")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -480,6 +533,27 @@ namespace Repository.UpCareData.Migrations
                     b.HasKey("FK_PrescriptionId", "FK_RadiologyId");
 
                     b.ToTable("RadiologyInPrescriptions");
+                });
+
+            modelBuilder.Entity("Core.UpCareEntities.UserConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ConnectionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FK_UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserConnections");
                 });
 #pragma warning restore 612, 618
         }

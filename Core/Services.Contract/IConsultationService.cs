@@ -12,5 +12,6 @@ namespace Core.Services.Contract
         Task<PatientConsultation> AddConsultationAsync(PatientConsultation patientConsultation);
         Task<int> DeleteAsync(PatientConsultation patientConsultation);
         Task<Doctor> GetFirstAvailableDoctorBySpeciality(string speciality);
+        Task<List<PatientConsultation>> GetAllConsultationsAsync();
     }
 }

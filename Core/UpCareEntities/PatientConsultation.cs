@@ -16,5 +16,7 @@ namespace Core.UpCareEntities
         public DateTime DateTime { get; set; } = DateTime.UtcNow;
         [Required]
         public ConsultationType Type { get; set; }
+        public string PaymentIntentId { get; set; } = string.Empty;
+        public string ClientSecret { get; set; } = string.Empty;
     }
 }

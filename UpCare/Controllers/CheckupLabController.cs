@@ -40,6 +40,7 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
+                Id = user.Id,
                 FirstName = user.Name,
                 UserName = user.UserName,
                 Email = model.Email,

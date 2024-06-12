@@ -39,7 +39,8 @@ namespace UpCare.Controllers
                 return Unauthorized(new ApiResponse(401, "incorrect email or password"));
 
             return Ok(new UserDto()
-            {
+            {   
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
@@ -77,6 +78,7 @@ namespace UpCare.Controllers
 
             return Ok(new UserDto()
             {
+                Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
@@ -106,6 +108,17 @@ namespace UpCare.Controllers
                 return NotFound(new ApiResponse(404, "there are no receptionists found"));
 
             return Ok(receptionists);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Receptionist>> GetSpecificDoctor(string id)
+        {
+            var doctor = await _userManager.FindByIdAsync(id);
+
+            if (doctor is null)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            return Ok(doctor);
         }
 
         /*

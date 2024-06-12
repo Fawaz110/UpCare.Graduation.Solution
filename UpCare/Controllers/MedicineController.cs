@@ -99,20 +99,13 @@ namespace UpCare.Controllers
         [HttpPost("update")] // POST: /api/medicine/update
         public async Task<ActionResult<SucceededToAdd>> Update([FromBody]Medicine medicine)
         {
-            try
-            {
-                _medicineService.UpdateMedicine(medicine);
+            _medicineService.UpdateMedicine(medicine);
 
-                return Ok(new SucceededToAdd
-                {
-                    Message = "success",
-                    Data = await _medicineService.GetByIdAsync(medicine.Id)
-                });
-
-            }catch(Exception ex)
+            return Ok(new SucceededToAdd
             {
-                return BadRequest(new ApiResponse(400, "an error occured during the update of data"));
-            }
+                Message = "success",
+                Data = await _medicineService.GetByIdAsync(medicine.Id)
+            });
         }
 
         [HttpDelete("delete")] // DELETE: /api/medicine/delete?id=

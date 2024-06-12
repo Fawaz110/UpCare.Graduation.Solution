@@ -4,6 +4,7 @@ using Core.Services.Contract;
 using Core.UnitOfWork.Contract;
 using Microsoft.AspNetCore.Identity;
 using Repository;
+using Repository.UpCareData;
 using Service;
 using UpCare.Helpers;
 
@@ -21,6 +22,9 @@ namespace UpCare.Extensions
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IPatientRoomRepository, PatientRoomRepository>();
             services.AddScoped<IConsultationRepository, ConsultationRepository>();
+            services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
+            services.AddScoped<INurseCareRepository, NurseCareRepository>();
+            services.AddScoped<IBillRepository, BillRepository>();
             services.AddScoped<IOperationRepository, OperationRepository>();
 
             #endregion
@@ -40,6 +44,10 @@ namespace UpCare.Extensions
             services.AddScoped<IAppointmentService, AppointmentService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IOperationService, OperationService>();
+            services.AddScoped<IPrescriptionService, PrescriptionService>();
+            services.AddScoped<INurseCareService, NurseCareService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IBillService, BillService>();
             services.AddScoped(typeof(IAuthServices), typeof(AuthServices));
 
             #endregion
@@ -50,6 +58,8 @@ namespace UpCare.Extensions
             services.AddScoped(typeof(UserManager<>));
             services.AddScoped(typeof(RoleManager<>));
             services.AddScoped<FireBaseServices>();
+            services.AddScoped<IMediator, Mediator>();
+            //services.AddSingleton<UpCareDbContext>();
             services.AddControllers();
 
             services.AddSignalR();
