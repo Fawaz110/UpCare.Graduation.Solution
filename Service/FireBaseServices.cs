@@ -113,99 +113,287 @@ namespace Service
         }
 
 
-        public async Task<(double, double, string, string, Patient)> GetLatestData()
+        //public async Task<(double, double, string, string, Patient)> GetLatestData()
+        //{
+        //    // Retrieve the latest data from each dictionary
+        //    var latestTemperature = await GetLatestEntry("temp");
+        //    var latestHumidity = await GetLatestEntry("hum");
+        //    var latestTime = await GetLatestDateTime("time");
+        //    var latestDate = await GetLatestDateTime("date");
+
+        //    var user = await _userManager.Users.FirstOrDefaultAsync();
+
+        //    return (latestTemperature, latestHumidity, latestTime, latestDate, user);
+        //}
+
+        //private async Task<float> GetLatestEntry(string nodeName)
+        //{
+        //    try
+        //    {
+        //        // Query Firebase database for the specified node
+        //        var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<float>();
+
+        //        // Find the latest entry
+        //        var latestEntry = firebaseData.LastOrDefault();
+
+        //        if (latestEntry != null)
+        //            return latestEntry.Object;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle error
+        //        Console.WriteLine($"Error retrieving latest entry from Firebase for {nodeName}: {ex.Message}");
+        //    }
+
+        //    // Return default value if no data found or error occurred
+        //    return default;
+        //}
+
+        //private async Task<string> GetLatestDateTime(string nodeName)
+        //{
+        //    try
+        //    {
+        //        // Query Firebase database for the specified node
+        //        var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<string>();
+
+        //        // Find the latest entry
+        //        var latestEntry = firebaseData.LastOrDefault();
+
+        //        if (latestEntry != null)
+        //        {
+        //            return latestEntry.Object;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle error
+        //        Console.WriteLine($"Error retrieving latest datetime from Firebase for {nodeName}: {ex.Message}");
+        //    }
+
+        //    // Return default value if no data found or error occurred
+        //    return default;
+        //}
+        //public async Task MonitorTemperature()
+        //{
+        //    // var latestTemperature = await GetLatestEntry("temp");
+        //    // Continuously monitor temperature data
+        //    while (true)
+        //    {
+        //        try
+        //        {
+        //            // Retrieve the latest temperature value from Firebase
+        //            var latestTemperature = await GetLatestEntry("temp");
+
+        //            // Check if the temperature equals 25
+        //            if (latestTemperature < 100)
+        //            {
+        //                // Send a notification message
+        //                SendEmailNotification("Temperature reached 25 degrees Celsius!");
+
+        //                break;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Handle error
+        //            Console.WriteLine($"Error monitoring temperature: {ex.Message}");
+        //        }
+
+        //        // Wait for a specified interval before checking again
+        //        await Task.Delay(TimeSpan.FromMinutes(1));
+        //    }
+        //}
+
+
+        
+        public async Task<List<Dictionary<string, object>>> GetCurrentHealthDataAsync()
         {
-            // Retrieve the latest data from each dictionary
-            var latestTemperature = await GetLatestEntry("temp");
-            var latestHumidity = await GetLatestEntry("hum");
-            var latestTime = await GetLatestDateTime("time");
-            var latestDate = await GetLatestDateTime("date");
+            var healthData = await _firebaseClient.Child("HealthCare").OnceAsync<Dictionary<string, object>>();
+            var currentDataList = new List<Dictionary<string, object>>();
 
-            var user = await _userManager.Users.FirstOrDefaultAsync();
+            foreach (var entry in healthData)
+            {
+                var data = entry.Object;
+                data["id"] = entry.Key; // Include the unique identifier in the data
+                currentDataList.Add(data);
+            }
 
-            return (latestTemperature, latestHumidity, latestTime, latestDate, user);
+            return currentDataList;
         }
 
-        private async Task<float> GetLatestEntry(string nodeName)
+        public async Task<List<Dictionary<string, object>>> GetTemperatureDataAsync()
         {
             try
             {
-                // Query Firebase database for the specified node
-                var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<float>();
+                var healthData = await _firebaseClient.Child("HealthCare").OnceAsync<Dictionary<string, object>>();
+                var temperatureDataList = new List<Dictionary<string, object>>();
 
-                // Find the latest entry
-                var latestEntry = firebaseData.LastOrDefault();
-
-                if (latestEntry != null)
-                    return latestEntry.Object;
-
-            }
-            catch (Exception ex)
-            {
-                // Handle error
-                Console.WriteLine($"Error retrieving latest entry from Firebase for {nodeName}: {ex.Message}");
-            }
-
-            // Return default value if no data found or error occurred
-            return default;
-        }
-
-        private async Task<string> GetLatestDateTime(string nodeName)
-        {
-            try
-            {
-                // Query Firebase database for the specified node
-                var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<string>();
-
-                // Find the latest entry
-                var latestEntry = firebaseData.LastOrDefault();
-
-                if (latestEntry != null)
+                foreach (var entry in healthData)
                 {
-                    return latestEntry.Object;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle error
-                Console.WriteLine($"Error retrieving latest datetime from Firebase for {nodeName}: {ex.Message}");
-            }
-
-            // Return default value if no data found or error occurred
-            return default;
-        }
-        public async Task MonitorTemperature()
-        {
-            // var latestTemperature = await GetLatestEntry("temp");
-            // Continuously monitor temperature data
-            while (true)
-            {
-                try
-                {
-                    // Retrieve the latest temperature value from Firebase
-                    var latestTemperature = await GetLatestEntry("temp");
-
-                    // Check if the temperature equals 25
-                    if (latestTemperature < 100)
+                    var data = entry.Object;
+                    if (data.ContainsKey("temperature"))
                     {
-                        // Send a notification message
-                        SendEmailNotification("Temperature reached 25 degrees Celsius!");
-
-                        break;
+                        var temperatureEntry = new Dictionary<string, object>
+                        {
+                            { "id", entry.Key },
+                            { "temperature", data["temperature"] }
+                        };
+                        temperatureDataList.Add(temperatureEntry);
                     }
                 }
-                catch (Exception ex)
+
+                return temperatureDataList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving temperature data: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task<List<Dictionary<string, object>>> GetSpo2DataAsync()
+        {
+            try
+            {
+                var healthData = await _firebaseClient.Child("HealthCare").OnceAsync<Dictionary<string, object>>();
+                var spo2DataList = new List<Dictionary<string, object>>();
+
+                foreach (var entry in healthData)
                 {
-                    // Handle error
-                    Console.WriteLine($"Error monitoring temperature: {ex.Message}");
+                    var data = entry.Object;
+                    if (data.ContainsKey("spo2"))
+                    {
+                        var spo2Entry = new Dictionary<string, object>
+                        {
+                            { "id", entry.Key },
+                            { "spo2", data["spo2"] }
+                        };
+                        spo2DataList.Add(spo2Entry);
+                    }
                 }
 
-                // Wait for a specified interval before checking again
-                await Task.Delay(TimeSpan.FromMinutes(1));
+                return spo2DataList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving Spo2 data: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task<List<Dictionary<string, object>>> GetHeartRateDataAsync()
+        {
+            try
+            {
+                var healthData = await _firebaseClient.Child("HealthCare").OnceAsync<Dictionary<string, object>>();
+                var heartRateDataList = new List<Dictionary<string, object>>();
+
+                foreach (var entry in healthData)
+                {
+                    var data = entry.Object;
+                    if (data.ContainsKey("heart_rate"))
+                    {
+                        var heartRateEntry = new Dictionary<string, object>
+                        {
+                            { "id", entry.Key },
+                            { "heart_rate", data["heart_rate"] }
+                        };
+                        heartRateDataList.Add(heartRateEntry);
+                    }
+                }
+
+                return heartRateDataList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving Heart Rate data: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task<List<Dictionary<string, object>>> GetHumidityDataAsync()
+        {
+            try
+            {
+                var healthData = await _firebaseClient.Child("HealthCare").OnceAsync<Dictionary<string, object>>();
+                var humidityDataList = new List<Dictionary<string, object>>();
+
+                foreach (var entry in healthData)
+                {
+                    var data = entry.Object;
+                    if (data.ContainsKey("humidity"))
+                    {
+                        var humidityEntry = new Dictionary<string, object>
+                        {
+                            { "id", entry.Key },
+                            { "humidity", data["humidity"] }
+                        };
+                        humidityDataList.Add(humidityEntry);
+                    }
+                }
+
+                return humidityDataList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving Humidity data: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task<Dictionary<string, object>> GetLatestReadingAsync()
+        {
+            try
+            {
+                var healthData = await _firebaseClient.Child("HealthCare").OnceAsync<Dictionary<string, object>>();
+
+                var latestReading = new Dictionary<string, object>();
+
+                // Get the latest entry for each parameter
+                var latestTemperature = GetLatestParameterEntry(healthData, "temperature");
+                var latestHumidity = GetLatestParameterEntry(healthData, "humidity");
+                var latestHeartRate = GetLatestParameterEntry(healthData, "heart_rate");
+                var latestSpo2 = GetLatestParameterEntry(healthData, "spo2");
+
+                // Add latest readings to the dictionary
+                latestReading.Add("temperature", latestTemperature);
+                latestReading.Add("humidity", latestHumidity);
+                latestReading.Add("heart_rate", latestHeartRate);
+                latestReading.Add("spo2", latestSpo2);
+
+                if (latestHeartRate.ContainsKey("heart_rate") && double.TryParse(latestHeartRate["heart_rate"].ToString(), out double heartRate))
+                {
+                    if (heartRate < 90)
+                    {
+                        string message = $"Alert: Heart rate is below 90! Current heart rate: {heartRate}";
+                        SendEmailNotification(message);
+                    }
+                }
+
+                return latestReading;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving latest reading: {ex.Message}");
+                throw;
             }
         }
 
+        private Dictionary<string, object> GetLatestParameterEntry(IEnumerable<FirebaseObject<Dictionary<string, object>>> healthData, string parameter)
+        {
+            var latestEntry = healthData.OrderByDescending(x => x.Object["timestamp"]).FirstOrDefault(x => x.Object.ContainsKey(parameter));
 
+            if (latestEntry != null)
+            {
+                var parameterEntry = new Dictionary<string, object>
+                {
+                    { "id", latestEntry.Key },
+                    { parameter, latestEntry.Object[parameter] }
+                };
+                return parameterEntry;
+            }
+            else
+            {
+                return new Dictionary<string, object>();
+            }
+        }
         private void SendEmailNotification(string message)
         {
             try
@@ -220,7 +408,7 @@ namespace Service
                     // Create and send the email message
                     var mailMessage = new MailMessage("mailtrap@demomailtrap.com", _recipientEmailAddress)
                     {
-                        Subject = "Temperature Notification",
+                        Subject = "Heart Rate Alert",
                         Body = message
                     };
 
@@ -234,6 +422,7 @@ namespace Service
                 Console.WriteLine($"Error sending email notification: {ex.Message}");
             }
         }
+
 
     }
 }
