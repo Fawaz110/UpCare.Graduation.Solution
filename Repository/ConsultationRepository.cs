@@ -20,6 +20,9 @@ namespace Repository
         public void DeleteAsync(PatientConsultation patientConsultation)
             => _context.Set<PatientConsultation>().Remove(patientConsultation);
 
+        public async Task<List<PatientConsultation>> GetAllAsync()
+            => await _context.Set<PatientConsultation>().OrderByDescending(x=>x.DateTime).ToListAsync();
+
         public async Task<List<PatientConsultation>> GetByDoctorIdAsync(string doctorId)
             => await _context.Set<PatientConsultation>().Where(pc => pc.FK_DoctorId == doctorId).ToListAsync();
 

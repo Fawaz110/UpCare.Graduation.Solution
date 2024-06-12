@@ -41,8 +41,8 @@ namespace UpCare.Extensions
             try
             {
                 var patientUserManager = services.GetRequiredService<UserManager<Patient>>();
-                await PatientDbContextSeed.PatientUsersSeed(patientUserManager, logger);
                 await _patientDbContext.Database.MigrateAsync();
+                await PatientDbContextSeed.PatientUsersSeed(patientUserManager, logger);
             }
             catch (Exception ex)
             {
@@ -52,8 +52,8 @@ namespace UpCare.Extensions
             try
             {
                 var radiologyUserManager = services.GetRequiredService<UserManager<RadiologyLab>>();
-                await RadiologyDbContextSeed.RadiologyUserSeed(radiologyUserManager, logger);
                 await _radiologyLabDbContext.Database.MigrateAsync();
+                await RadiologyDbContextSeed.RadiologyUserSeed(radiologyUserManager, logger);
             }
             catch (Exception ex)
             {
@@ -63,8 +63,8 @@ namespace UpCare.Extensions
             try
             {
                 var checkupLabUserManager = services.GetRequiredService<UserManager<CheckupLab>>();
-                await CheckupLabDbContextSeed.CheckupLabUserSeed(checkupLabUserManager, logger);
                 await _checkupLabDbContext.Database.MigrateAsync();
+                await CheckupLabDbContextSeed.CheckupLabUserSeed(checkupLabUserManager, logger);
             }
             catch (Exception ex)
             {
@@ -74,8 +74,8 @@ namespace UpCare.Extensions
             try
             {
                 var nurseUserManager = services.GetRequiredService<UserManager<Nurse>>();
-                await NurseDbContextSeed.NurseUsersSeed(nurseUserManager, logger);
                 await _nurseDbContext.Database.MigrateAsync();
+                await NurseDbContextSeed.NurseUsersSeed(nurseUserManager, logger);
             }
             catch (Exception ex)
             {
@@ -85,8 +85,8 @@ namespace UpCare.Extensions
             try
             {
                 var doctorUserManager = services.GetRequiredService<UserManager<Doctor>>();
-                await DoctorDbContextSeed.DoctorUsersSeed(doctorUserManager, logger);
                 await _doctorDbContext.Database.MigrateAsync();
+                await DoctorDbContextSeed.DoctorUsersSeed(doctorUserManager, logger);
             }
             catch (Exception ex)
             {
@@ -96,8 +96,8 @@ namespace UpCare.Extensions
             try
             {
                 var receptionistUserManager = services.GetRequiredService<UserManager<Receptionist>>();
-                await ReceptionistDbContextSeed.ReceptionistUsersSeed(receptionistUserManager, logger);
                 await _receptionistDbContext.Database.MigrateAsync();
+                await ReceptionistDbContextSeed.ReceptionistUsersSeed(receptionistUserManager, logger);
             }
             catch (Exception ex)
             {
@@ -107,15 +107,13 @@ namespace UpCare.Extensions
             try
             {
                 var adminUserManager = services.GetRequiredService<UserManager<Admin>>();
-                await AdminDbContextSeed.AdminUsersSeed(adminUserManager, logger);
                 await _adminDbContext.Database.MigrateAsync();
+                await AdminDbContextSeed.AdminUsersSeed(adminUserManager, logger);
             }
             catch(Exception ex) 
             {
                 logger.LogError(ex, "Error occured during excuting AdminDbContext pending migrations..(*_*)");
             }
-
-
         }
     }
 }

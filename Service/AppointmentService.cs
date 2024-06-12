@@ -4,6 +4,8 @@ using Core.UnitOfWork.Contract;
 using Core.UpCareEntities;
 using Core.UpCareUsers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Stripe;
 
 namespace Repository
 {
@@ -15,6 +17,7 @@ namespace Repository
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IOperationRepository _operationRepository;
+        private readonly IConfiguration _configuration;
 
         public AppointmentService(
             UserManager<Patient> patientManager,
@@ -22,7 +25,8 @@ namespace Repository
             IConsultationRepository consultationRepository,
             IUnitOfWork unitOfWork,
             IAppointmentRepository appointmentRepository,
-            IOperationRepository operationRepository)
+            IOperationRepository operationRepository,
+            IConfiguration configuration)
         {
             this._patientManager = patientManager;
             this._doctorManager = doctorManager;
@@ -30,6 +34,7 @@ namespace Repository
             _unitOfWork = unitOfWork;
             _appointmentRepository = appointmentRepository;
             _operationRepository = operationRepository;
+            _configuration = configuration;
         }
 
         public async Task<PatientAppointment> AddAppointmentAsync(PatientAppointment appointment)
@@ -47,8 +52,42 @@ namespace Repository
             if (!(await ConsultationTimeIsAvailable(appointment)))
                 return null;
 
+            StripeConfiguration.ApiKey = _configuration["StripeSettings:SecretKey"];
+
+            PaymentIntentService paymentIntentService = new PaymentIntentService();
+
+            PaymentIntent paymentIntent;
+
+            if (string.IsNullOrEmpty(appointment.PaymentIntentId)) // Create PaymentIntent
+            {
+                var options = new PaymentIntentCreateOptions
+                {
+                    Amount = (long)(doctor.AppointmentPrice * 100),
+                    PaymentMethodTypes = new List<string>() { "card" },
+                    Currency = "usd"
+                };
+                if (options.Amount > 0)
+                {
+                    paymentIntent = await paymentIntentService.CreateAsync(options);
+                    appointment.PaymentIntentId = paymentIntent.Id;
+                    appointment.ClientSecret = paymentIntent.ClientSecret;
+                }
+            }
+            else // Update PaymentIntent
+            {
+                var options = new PaymentIntentUpdateOptions
+                {
+                    Amount = (long)(doctor.AppointmentPrice * 100)
+                };
+
+                if (options.Amount > 0)
+                    paymentIntent = await paymentIntentService.UpdateAsync(appointment.PaymentIntentId, options);
+                
+            }
+
             await _appointmentRepository.AddAppointmentAsync(appointment);
-            await _unitOfWork.CompleteAsync();
+
+            var result = await _unitOfWork.CompleteAsync();
 
             return appointment;
         }

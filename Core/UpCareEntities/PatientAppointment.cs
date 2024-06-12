@@ -15,6 +15,8 @@ namespace Core.UpCareEntities
         public string FK_PatientId { get; set; }
         public string FK_DoctorId { get; set; }
         public DateTime DateTime { get; set; } = DateTime.UtcNow;
+        public string PaymentIntentId { get; set; } = string.Empty;
+        public string ClientSecret { get; set; } = string.Empty;
         public AppointmentType Type { get; set; }
     }
 }

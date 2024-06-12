@@ -41,6 +41,9 @@ namespace UpCare.Controllers
             var objectToReturn = new ConsultationDto
             {
                 DateTime = consultation.DateTime,
+                Type = result.Type,
+                PaymentIntentId = result.PaymentIntentId,
+                ClientSecret = result.ClientSecret,
                 Doctor = await _doctorManager.FindByIdAsync(consultation.FK_DoctorId),
                 Patient = await _patientManager.FindByIdAsync(consultation.FK_PatientId)
             };
@@ -161,6 +164,9 @@ namespace UpCare.Controllers
 
             var result = await _consultationService.GetByPatientIdAsync(id);
 
+            if (result.Count() == 0 || result is null)
+                return NotFound(new ApiResponse(404, "no data found"));
+
             var consultations = result.Where(x => x.DateTime > DateTime.UtcNow).ToList();
 
             if (consultations.Count() == 0)
@@ -211,6 +217,34 @@ namespace UpCare.Controllers
             });
         }
 
+        [HttpGet("emergency/all")] // POST: /api/consultation/emergency/all
+        public async Task<ActionResult<List<ConsultationDto>>> GetAllEmergency()
+        {
+            var emergencyList = await _consultationService.GetAllConsultationsAsync();
+
+            var result = new List<ConsultationDto>();
+
+            foreach (var emergency in emergencyList)
+            {
+                if(emergency.Type == ConsultationType.OfflineEmergency || emergency.Type == ConsultationType.OnlineEmergency)
+                {
+                    var item = new ConsultationDto
+                    {
+                        Type = emergency.Type,
+                        DateTime = emergency.DateTime,
+                        Doctor = await _doctorManager.FindByIdAsync(emergency.FK_DoctorId),
+                        Patient = await _patientManager.FindByIdAsync(emergency.FK_PatientId)
+                    };
+                    result.Add(item);
+                }    
+            }
+
+            if (result.Count() == 0)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            return Ok(result);
+        }
+
         [HttpPost("emergency")] // POST: /api/consultation/emergency
         public async Task<ActionResult<SucceededToAdd>> AddEmergency([FromBody]EmergencyDto model)
         {
@@ -245,6 +279,8 @@ namespace UpCare.Controllers
                 Message = "success",
                 Data = new ConsultationDto
                 {
+                    PaymentIntentId = added.PaymentIntentId,
+                    ClientSecret = added.ClientSecret,
                     Doctor = await _doctorManager.FindByIdAsync(added.FK_DoctorId),
                     Patient = await _patientManager.FindByIdAsync(added.FK_PatientId),
                     DateTime = added.DateTime,
