@@ -15,6 +15,6 @@ namespace UpCare.DTOs.RoomDtos
         public int AvailableBedsNumber { set; get; }
         [Required]
         public Receptionist Receptionist { set; get; }
-        public List<Core.UpCareUsers.Patient> Patients { get; set; }
+        public List<PatientBookingDto> PatientBooking { get; set; }
     }
 }

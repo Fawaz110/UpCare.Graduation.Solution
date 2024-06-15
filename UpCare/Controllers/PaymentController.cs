@@ -74,6 +74,26 @@ namespace UpCare.Controllers
             });
         }
 
+        [HttpPost("intent/booking")] // POST: /api/payment/intent/booking
+        public async Task<ActionResult<SucceededToAdd>> CreateOrUpdateBookingPaymentIntent([FromBody] PatientBookRoom model)
+        {
+            var patient = await _patientManager.FindByIdAsync(model.FK_PatientId);
+
+            if (patient is null)
+                return NotFound(new ApiResponse(404, "no patient matches found"));
+
+            var bill = await _paymentService.CreateOrUpdatePaymentIntent(model);
+
+            if (bill is null) 
+                return BadRequest(new ApiResponse(400, "no payment done"));
+
+            return Ok(new SucceededToAdd
+            {
+                Message = "success",
+                Data = bill
+            });
+        }
+
         #region Commented Webhook
         //[HttpPost("webhook")] // POST: /api/payment/webhook
         //public async Task<IActionResult> CompletePayment()

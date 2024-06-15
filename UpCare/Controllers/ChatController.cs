@@ -192,7 +192,7 @@ namespace UpCare.Controllers
         }
 
         [HttpGet("admin/receive/doctor/{doctorId}")] // GET: /api/chat/admin/receive/doctor/{doctorId}?id={string}&role={int}
-        public async Task<ActionResult<List<MessageToReturnDto>>> GetMessagesForSpecificDoctor([FromQuery] string id,[FromQuery] MessagerRole? role = MessagerRole.Admin)
+        public async Task<ActionResult<List<MessageToReturnDto>>> GetMessagesForSpecificDoctor(string doctorId, [FromQuery] string id,[FromQuery] MessagerRole? role = MessagerRole.Admin)
         {
             var admin = await _adminManager.FindByIdAsync(id);
 
@@ -202,7 +202,12 @@ namespace UpCare.Controllers
             if (role != MessagerRole.Admin)
                 return BadRequest(new ApiResponse(400, "request only allowed for admins"));
 
-            var messages = await _context.Set<Message>().Where(x => (x.SenderId == id || x.ReceiverId == id))
+            var doctor = await _doctorManager.FindByIdAsync(doctorId);
+
+            if (doctor is null)
+                return NotFound(new ApiResponse(404, "no doctor matches found"));
+
+            var messages = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.ReceiverId == doctorId) || (x.ReceiverId == id && x.SenderId == doctorId)))
                                                         .Select(x => new MessageToReturnDto
                                                         {
                                                             Content = x.Content,
@@ -213,6 +218,9 @@ namespace UpCare.Controllers
                                                             SenderRole = x.SenderRole,
                                                             isSent = (x.SenderId == id) ? true : false
                                                         }).OrderByDescending(x => x.DateTime).ToListAsync();
+
+            if (messages.Count() == 0)
+                return NotFound(new ApiResponse(404, "no messages found"));
 
             return Ok(messages);
         }

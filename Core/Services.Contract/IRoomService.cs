@@ -9,5 +9,6 @@ namespace Core.Services.Contract
         Task<PatientBookRoom> BookRoomAsync(PatientBookRoom patientBookRoom);
         Task<List<PatientBookRoom>> GetAllPatientBookingAsync();
         Task<PatientBookRoom> EndPatientRoomBooking(PatientBookRoom patientBookRoom);
+        Task<PatientBookRoom> GetSpecificBookingAsync(string patientId, int roomId);
     }
 }

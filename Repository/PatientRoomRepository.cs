@@ -28,5 +28,8 @@ namespace Repository
             => await _context.Set<PatientBookRoom>().Where(x => x.FK_DoctorId == data.FK_DoctorId
                                                              && x.FK_PatientId == data.FK_PatientId
                                                              && x.StartDate == data.StartDate).FirstOrDefaultAsync();
+
+        public async Task<PatientBookRoom> GetSpecificBookingAsync(string patientId, int roomId)
+            => await _context.Set<PatientBookRoom>().FirstOrDefaultAsync(x => x.FK_PatientId == patientId && x.FK_RoomId == roomId);
     }
 }
