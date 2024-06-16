@@ -8,5 +8,6 @@ namespace Core.Repositories.Contract
         Task AddBookingRoomAsync(PatientBookRoom data);
         void UpdatePatintBookRoom(PatientBookRoom data);
         Task<PatientBookRoom> GetSpecificRecord(PatientBookRoom data);
+        Task<PatientBookRoom> GetSpecificBookingAsync(string patientId, int roomId);
     }
 }

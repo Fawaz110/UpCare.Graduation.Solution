@@ -55,7 +55,7 @@ namespace UpCare.Controllers
                     NumberOfBeds = room.NumberOfBeds,
                     PricePerNight = room.PricePerNight,
                     Receptionist = await _receptionistManager.FindByIdAsync(room.FK_ReceptionistId),
-                    Patients = await GetPatientsInRoom(room.Id)
+                    PatientBooking = await GetPatientsInRoom(room.Id)
                 };
 
                 listToReturn.Add(item);
@@ -87,7 +87,7 @@ namespace UpCare.Controllers
                 AvailableBedsNumber = room.AvailableBeds,
                 PricePerNight = room.PricePerNight,
                 Receptionist = receptionist,
-                Patients = patients
+                PatientBooking = patients
             };
 
             return Ok(roomToReturn);
@@ -115,7 +115,7 @@ namespace UpCare.Controllers
                     PricePerNight = record.PricePerNight,
                     AvailableBedsNumber = record.AvailableBeds,
                     Receptionist = await _receptionistManager.FindByIdAsync(record.FK_ReceptionistId),
-                    Patients = new List<Patient>()
+                    PatientBooking = new List<PatientBookingDto>()
                 }
             });
         }
@@ -153,7 +153,7 @@ namespace UpCare.Controllers
                     PricePerNight = room.PricePerNight,
                     AvailableBedsNumber = room.AvailableBeds,
                     Receptionist = await _receptionistManager.FindByIdAsync(room.FK_ReceptionistId),
-                    Patients = patients
+                    PatientBooking = patients
                 }
             });
         }
@@ -188,7 +188,7 @@ namespace UpCare.Controllers
                 NumberOfBeds = room.NumberOfBeds,
                 PricePerNight = room.PricePerNight,
                 Receptionist = await _receptionistManager.FindByIdAsync(room.FK_ReceptionistId),
-                Patients = await GetPatientsInRoom(room.Id)
+                PatientBooking = await GetPatientsInRoom(room.Id)
             };
 
             return Ok(new SucceededToAdd
@@ -228,7 +228,7 @@ namespace UpCare.Controllers
                 NumberOfBeds = room.NumberOfBeds,
                 PricePerNight = room.PricePerNight,
                 Receptionist = await _receptionistManager.FindByIdAsync(room.FK_ReceptionistId),
-                Patients = await GetPatientsInRoom(room.Id)
+                PatientBooking = await GetPatientsInRoom(room.Id)
             });
         }
 
@@ -241,6 +241,8 @@ namespace UpCare.Controllers
                 return NotFound(new ApiResponse(404, "no data matches found"));
 
             _unitOfWork.Repository<Room>().Delete(room);
+
+            // delete patients book room records where room id
             
             await _unitOfWork.CompleteAsync();
 
@@ -248,20 +250,24 @@ namespace UpCare.Controllers
         }
 
         // Method to get patients in specific room that no ended there booking
-        private async Task<List<Patient>> GetPatientsInRoom(int roomId)
+        private async Task<List<PatientBookingDto>> GetPatientsInRoom(int roomId)
         {
-            List<Patient> patients = new List<Patient>();
+            List<PatientBookingDto> patients = new List<PatientBookingDto>();
 
             var allRecords = await _roomService.GetAllPatientBookingAsync();
 
-            var patientsIds = allRecords.Where(x => x.EndDate != DateTime.MinValue && x.FK_RoomId == roomId).Select(x => x.FK_PatientId).Distinct().ToList();
+            var patientsIds = allRecords.Where(x => x.EndDate == DateTime.MinValue && x.FK_RoomId == roomId).Select(x => x.FK_PatientId).Distinct().ToList();
 
             foreach (var id in patientsIds)
             {
-                var pt = await _patientManager.FindByIdAsync(id);
+                var itemToAdd = new PatientBookingDto
+                {
+                    Patient = await _patientManager.FindByIdAsync(id),
+                    RoomInfo = await _roomService.GetSpecificBookingAsync(id, roomId)
+                };
 
-                if (!patients.Contains(pt))
-                    patients.Add(pt);
+                if (!(patients.Contains(itemToAdd)) && itemToAdd.RoomInfo.EndDate == DateTime.MinValue)
+                    patients.Add(itemToAdd);
             }
 
             return patients;

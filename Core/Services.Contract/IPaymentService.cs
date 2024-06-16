@@ -1,4 +1,5 @@
-﻿using Core.UpCareEntities.BillEntities;
+﻿using Core.UpCareEntities;
+using Core.UpCareEntities.BillEntities;
 using Core.UpCareEntities.PrescriptionEntities;
 
 namespace Core.Services.Contract
@@ -14,6 +15,7 @@ namespace Core.Services.Contract
     {
         Task<Prescription> CreateOrUpdatePaymentIntent(int prescriptionId, PrescriptionPayment payment);
         Task<Bill> CreateOrUpdatePaymentIntent(Bill bill);
+        Task<Bill> CreateOrUpdatePaymentIntent(PatientBookRoom patientBookRoom);
         Task<Bill> UpdatePaymentIntentToSucceededOrFailed(string paymentIntentId, bool isSucceeded);
     }
 }

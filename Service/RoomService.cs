@@ -103,5 +103,8 @@ namespace Service
 
             return record;
         }
+
+        public async Task<PatientBookRoom> GetSpecificBookingAsync(string patientId, int roomId)
+            => await _patientRoomRepository.GetSpecificBookingAsync(patientId, roomId);
     }
 }

@@ -196,7 +196,7 @@ namespace UpCare.Controllers
             return Ok(listToReturn.OrderByDescending(x => x.DateTime));
         }
 
-        [HttpDelete("cancel")] // DELETE: /api/appintment/cancel
+        [HttpPost("cancel")] // DELETE: /api/appintment/cancel
         public async Task<ActionResult<SucceededToAdd>> Cancel([FromBody]PatientAppointment patientAppointment)
         {
             var rowsAffected = await _appointmentService.DeleteAsync(patientAppointment);

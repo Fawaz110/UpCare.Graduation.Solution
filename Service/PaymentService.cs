@@ -416,6 +416,72 @@ namespace Service
             return bill;
         }
 
+        public async Task<Bill> CreateOrUpdatePaymentIntent(PatientBookRoom patientBookRoom)
+        {
+            var room = await _unitOfWork.Repository<Room>().GetByIdAsync(patientBookRoom.FK_RoomId);
+
+            if (room is null)
+                return null;
+
+            var bill = new Bill()
+            {
+                DateTime = DateTime.Now,
+                DeliveredService = "room reservation",
+                FK_PayorId = patientBookRoom.FK_PatientId,
+            };
+
+            StripeConfiguration.ApiKey = _configuration["StripeSettings:SecretKey"];
+
+            PaymentIntentService paymentIntentService = new PaymentIntentService();
+
+            PaymentIntent paymentIntent;
+
+            if (string.IsNullOrEmpty(bill.PaymentIntentId)) // Create PaymentIntent
+            {
+
+                TimeSpan diff = bill.DateTime - patientBookRoom.StartDate;
+
+                var period = Math.Abs(diff.Days);
+
+                PaymentIntentCreateOptions options = new PaymentIntentCreateOptions()
+                {
+                    Amount = (long)(period * room.PricePerNight * 100),
+                    Currency = "usd",
+                    PaymentMethodTypes = new List<string>() { "card" }
+                };
+
+                if(options.Amount > 0)
+                {
+                    paymentIntent = await paymentIntentService.CreateAsync(options);
+                    bill.PaymentIntentId = paymentIntent.Id;
+                    bill.ClientSecret = paymentIntent.ClientSecret;
+                }
+                else
+                {
+                    return null;
+                }
+
+            } // Create PaymentIntent
+            else // Update PaymentIntent
+            {
+                PaymentIntentUpdateOptions options = new PaymentIntentUpdateOptions()
+                {
+                    Amount = (long)(bill.PaidMoney * 100)
+                };
+
+                await paymentIntentService.UpdateAsync(bill.PaymentIntentId, options);
+            } // Update PaymentIntent
+
+            await _unitOfWork.Repository<Bill>().Add(bill);
+
+            var result = await _unitOfWork.CompleteAsync();
+
+            if (result <= 0)
+                return null;
+
+            return bill;
+        }
+
         public async Task<Bill> UpdatePaymentIntentToSucceededOrFailed(string paymentIntentId, bool isSucceeded)
             => await _billService.GetWithPaymentIntent(paymentIntentId);
     }

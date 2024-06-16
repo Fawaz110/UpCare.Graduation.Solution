@@ -289,7 +289,7 @@ namespace UpCare.Controllers
             }) ;
         }
 
-        [HttpDelete("cancel")] // DELETE: /api/consultation/cancel
+        [HttpPost("cancel")] // POST: /api/consultation/cancel
         public async Task<ActionResult<ApiResponse>> CancelConsultation([FromBody]PatientConsultation consultation)
         {
             var rowsAffected = await _consultationService.DeleteAsync(consultation);
