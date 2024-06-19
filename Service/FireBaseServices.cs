@@ -113,99 +113,6 @@ namespace Service
         }
 
 
-        //public async Task<(double, double, string, string, Patient)> GetLatestData()
-        //{
-        //    // Retrieve the latest data from each dictionary
-        //    var latestTemperature = await GetLatestEntry("temp");
-        //    var latestHumidity = await GetLatestEntry("hum");
-        //    var latestTime = await GetLatestDateTime("time");
-        //    var latestDate = await GetLatestDateTime("date");
-
-        //    var user = await _userManager.Users.FirstOrDefaultAsync();
-
-        //    return (latestTemperature, latestHumidity, latestTime, latestDate, user);
-        //}
-
-        //private async Task<float> GetLatestEntry(string nodeName)
-        //{
-        //    try
-        //    {
-        //        // Query Firebase database for the specified node
-        //        var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<float>();
-
-        //        // Find the latest entry
-        //        var latestEntry = firebaseData.LastOrDefault();
-
-        //        if (latestEntry != null)
-        //            return latestEntry.Object;
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle error
-        //        Console.WriteLine($"Error retrieving latest entry from Firebase for {nodeName}: {ex.Message}");
-        //    }
-
-        //    // Return default value if no data found or error occurred
-        //    return default;
-        //}
-
-        //private async Task<string> GetLatestDateTime(string nodeName)
-        //{
-        //    try
-        //    {
-        //        // Query Firebase database for the specified node
-        //        var firebaseData = await _firebaseClient.Child(nodeName).OnceAsync<string>();
-
-        //        // Find the latest entry
-        //        var latestEntry = firebaseData.LastOrDefault();
-
-        //        if (latestEntry != null)
-        //        {
-        //            return latestEntry.Object;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle error
-        //        Console.WriteLine($"Error retrieving latest datetime from Firebase for {nodeName}: {ex.Message}");
-        //    }
-
-        //    // Return default value if no data found or error occurred
-        //    return default;
-        //}
-        //public async Task MonitorTemperature()
-        //{
-        //    // var latestTemperature = await GetLatestEntry("temp");
-        //    // Continuously monitor temperature data
-        //    while (true)
-        //    {
-        //        try
-        //        {
-        //            // Retrieve the latest temperature value from Firebase
-        //            var latestTemperature = await GetLatestEntry("temp");
-
-        //            // Check if the temperature equals 25
-        //            if (latestTemperature < 100)
-        //            {
-        //                // Send a notification message
-        //                SendEmailNotification("Temperature reached 25 degrees Celsius!");
-
-        //                break;
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            // Handle error
-        //            Console.WriteLine($"Error monitoring temperature: {ex.Message}");
-        //        }
-
-        //        // Wait for a specified interval before checking again
-        //        await Task.Delay(TimeSpan.FromMinutes(1));
-        //    }
-        //}
-
-
         
         public async Task<List<Dictionary<string, object>>> GetCurrentHealthDataAsync()
         {
@@ -363,7 +270,7 @@ namespace Service
                     if (heartRate < 90)
                     {
                         string message = $"Alert: Heart rate is below 90! Current heart rate: {heartRate}";
-                        SendEmailNotification(message);
+                        await SendEmailNotification(message);
                     }
                 }
 
@@ -394,7 +301,7 @@ namespace Service
                 return new Dictionary<string, object>();
             }
         }
-        private void SendEmailNotification(string message)
+        private async Task SendEmailNotification(string message)
         {
             try
             {
@@ -405,11 +312,14 @@ namespace Service
                     smtpClient.UseDefaultCredentials = false;
                     smtpClient.Credentials = new NetworkCredential("api", "be03d5972bfd0863bcc85baab6b81934");
 
+                    
+                    var patient = await _userManager.Users.FirstOrDefaultAsync();
+
                     // Create and send the email message
                     var mailMessage = new MailMessage("mailtrap@demomailtrap.com", _recipientEmailAddress)
                     {
                         Subject = "Heart Rate Alert",
-                        Body = message
+                        Body = $"Patient information:\n\tPatient Name: {patient.FirstName} {patient.LastName}\n\tEmail: {patient.Email}\n\tAddress: {patient.Address}\n\tPhone Number: {patient.PhoneNumber}\n\tGender: {patient.Gender.ToString()}\n\n {message}"
                     };
 
                     smtpClient.Send(mailMessage);

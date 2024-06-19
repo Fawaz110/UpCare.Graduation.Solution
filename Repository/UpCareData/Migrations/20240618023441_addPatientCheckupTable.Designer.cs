@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.UpCareData;
 
@@ -11,9 +12,10 @@ using Repository.UpCareData;
 namespace Repository.UpCareData.Migrations
 {
     [DbContext(typeof(UpCareDbContext))]
-    partial class UpCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240618023441_addPatientCheckupTable")]
+    partial class addPatientCheckupTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -454,26 +456,6 @@ namespace Repository.UpCareData.Migrations
                     b.HasKey("FK_PatientId", "FK_DoctorId", "DateTime");
 
                     b.ToTable("PatientConsultations");
-                });
-
-            modelBuilder.Entity("Core.UpCareEntities.PatientRadiology", b =>
-                {
-                    b.Property<string>("FK_PatientId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("FK_RadiologyId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Result")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("FK_PatientId", "FK_RadiologyId", "DateTime");
-
-                    b.ToTable("PatientRadiologies");
                 });
 
             modelBuilder.Entity("Core.UpCareEntities.PrescriptionEntities.CheckupInPrescription", b =>

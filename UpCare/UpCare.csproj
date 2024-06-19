@@ -21,4 +21,9 @@
     <ProjectReference Include="..\Service\Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Uploads\Checkups\" />
+    <Folder Include="wwwroot\Uploads\Radiologies\" />
+  </ItemGroup>
+
 </Project>

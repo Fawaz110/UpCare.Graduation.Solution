@@ -5,11 +5,6 @@ using Core.UnitOfWork.Contract;
 using Core.UpCareEntities;
 using Core.UpCareEntities.BillEntities;
 using Core.UpCareEntities.PrescriptionEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service
 {

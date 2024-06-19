@@ -305,6 +305,40 @@ namespace UpCare.Controllers
             ///return Ok(mapped); 
         }
 
+        [HttpGet("doctor/receive/admin/{adminId}")] // GET: /api/chat/doctor/receive/admin/{adminId}?id={string}&role={int}
+        public async Task<ActionResult<List<MessageToReturnDto>>> GetMessagesBetweenAdminAndDoctor([FromQuery]string id, string adminId, [FromQuery] MessagerRole role = MessagerRole.Doctor)
+        {
+            var doctor = await _doctorManager.FindByIdAsync(id);
+
+            if (doctor is null)
+                return Unauthorized(new ApiResponse(401, "unauthorized access"));
+
+            if (role != MessagerRole.Doctor)
+                return BadRequest(new ApiResponse(400, "request only allowed for doctors"));
+
+            var admin = await _adminManager.FindByIdAsync(adminId);
+
+            if (admin is null)
+                return NotFound(new ApiResponse(404, "no admin matches found"));
+
+            var messages = await _context.Set<Message>().Where(x => ((x.SenderId == id && x.ReceiverId == adminId) || (x.ReceiverId == id && x.SenderId == adminId)))
+                                                        .Select(x => new MessageToReturnDto
+                                                        {
+                                                            Content = x.Content,
+                                                            DateTime = x.DateTime,
+                                                            ReceiverId = x.ReceiverId,
+                                                            ReceiverRole = x.ReceiverRole,
+                                                            SenderId = x.SenderId,
+                                                            SenderRole = x.SenderRole,
+                                                            isSent = (x.SenderId == id) ? true : false
+                                                        }).OrderByDescending(x => x.DateTime).ToListAsync();
+
+            if (messages.Count() == 0)
+                return NotFound(new ApiResponse(404, "no messages found"));
+
+            return Ok(messages);
+        }
+
         [HttpGet("doctor/receive/patients")] // GET: /api/chat/receive?role={number}&id={string}
         public async Task<ActionResult<List<MessagePackage>>> GetPatientsMessages([FromQuery] string id, [FromQuery] MessagerRole? role = MessagerRole.Doctor)
         {

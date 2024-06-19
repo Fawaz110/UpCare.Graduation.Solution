@@ -1,4 +1,5 @@
 ﻿using Core.Entities.UpCareEntities;
+using Core.UpCareEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,7 @@ namespace Core.Repositories.Contract
     public interface ICheckupRepository : IGenericRepository<Checkup>
     {
         Task<Checkup> GetByName(string name);
+        Task AddPatientResult(PatientCheckup patientCheckup);
+        Task<List<PatientCheckup>> GetAllResults();
     }
 }

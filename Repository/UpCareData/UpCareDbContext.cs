@@ -29,6 +29,8 @@ namespace Repository.UpCareData
         public DbSet<DoctorDoOperation> DoctorDoOperations { get; set; }
         public DbSet<PatientAppointment> PatientAppointments { get; set; }
         public DbSet<PatientConsultation> PatientConsultations { get; set; }
+        public DbSet<PatientCheckup> PatientCheckups { get; set; }
+        public DbSet<PatientRadiology> PatientRadiologies { get; set; }
         public DbSet<Message> Messages { get; set; }
 
         #region Prescription & Related Tables

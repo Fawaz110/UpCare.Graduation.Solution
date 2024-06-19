@@ -1,5 +1,6 @@
 ﻿using Core.Entities.UpCareEntities;
 using Core.Specifications;
+using Core.UpCareEntities;
 
 namespace Core.Services.Contract
 {
@@ -11,5 +12,7 @@ namespace Core.Services.Contract
         Task<Checkup> AddAsync(Checkup entity);
         Task<Checkup> GetByIdAsync(int id);
         Task<Checkup> GetByName(string name);
+        Task<int> AddCheckupResult(PatientCheckup patientCheckup);
+        Task<List<PatientCheckup>> GetAllResults();
     }
 }

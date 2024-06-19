@@ -2,6 +2,7 @@
 using Core.Repositories.Contract;
 using Core.Services.Contract;
 using Core.UnitOfWork.Contract;
+using Core.UpCareEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +51,13 @@ namespace Service
 
         }
 
+        public async Task<int> AddRadiologyResult(PatientRadiology patientRadiology)
+        {
+            await _radiologyRepository.AddPatientResult(patientRadiology);
+
+            return await _unitOfWork.CompleteAsync();
+        }
+
         public async Task<int> DeleteAsync(int id)
         {
             var radiology = await _radiologyRepository.GetByIdAsync(id);
@@ -64,6 +72,9 @@ namespace Service
 
         public async Task<ICollection<Radiology>> GetAllAsync()
             => await _unitOfWork.Repository<Radiology>().GetAllAsync();
+
+        public async Task<List<PatientRadiology>> GetAllResults()
+            => await _radiologyRepository.GetAllResults();
 
         public async Task<Radiology> GetByIdAsync(int id)
             => await _unitOfWork.Repository<Radiology>().GetByIdAsync(id);

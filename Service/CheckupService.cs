@@ -2,6 +2,7 @@
 using Core.Repositories.Contract;
 using Core.Services.Contract;
 using Core.UnitOfWork.Contract;
+using Core.UpCareEntities;
 
 namespace Service
 {
@@ -39,7 +40,14 @@ namespace Service
                 return checkup;
             }
         }
-        
+
+        public Task<int> AddCheckupResult(PatientCheckup patientCheckup)
+        {
+            _checkupRepository.AddPatientResult(patientCheckup);
+
+            return _unitOfWork.CompleteAsync();
+        }
+
         public async Task<int> DeleteAsync(int id)
         {
             var checkup = await _unitOfWork.Repository<Checkup>().GetByIdAsync(id);
@@ -56,6 +64,9 @@ namespace Service
 
         public async Task<ICollection<Checkup>> GetAllAsync()
             => await _unitOfWork.Repository<Checkup>().GetAllAsync();
+
+        public async Task<List<PatientCheckup>> GetAllResults()
+            => await _checkupRepository.GetAllResults();
 
         public async Task<Checkup> GetByIdAsync(int id)
             => await _unitOfWork.Repository<Checkup>().GetByIdAsync(id);
