@@ -31,7 +31,7 @@ namespace Repository.UpCareData.Migrations
                 {
                     FK_NurseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FK_PatientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FK_RoomId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FK_RoomId = table.Column<int>(type: "int", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Suger = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BloodPresure = table.Column<string>(type: "nvarchar(max)", nullable: true),

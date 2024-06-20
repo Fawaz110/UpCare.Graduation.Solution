@@ -53,7 +53,7 @@ namespace UpCare.Controllers
 
             var mapped = await MapToBillDto(result.ToList());
 
-            return Ok(mapped);
+            return Ok(mapped.OrderByDescending(x => x.DateTime));
         }
 
         [HttpGet("{id}")] // GET: /api/bill/{id}

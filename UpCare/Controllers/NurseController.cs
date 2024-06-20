@@ -171,38 +171,27 @@ namespace UpCare.Controllers
             });
         }
 
-        [HttpGet("care/records")] // GET: /api/nurse/care/records?patientId={string}&nurseId={string}&roomId={int}&dateTime={DateTime}
-        public async Task<ActionResult<List<NurseCareDto>>> GetNurseCareRecords(string nurseId, string? patientId, int? roomId, DateTime dateTime)
+        [HttpGet("care/records")] // GET: /api/nurse/care/records?patientId={string}&nurseId={string}&roomId={int}
+        public async Task<ActionResult<List<NurseCareDto>>> GetNurseCareRecords(string patientId, int roomId)
         {
-            var nurse = await _nurseManager.FindByIdAsync(nurseId);
-
-            if (nurse is null)
-                return Unauthorized(new ApiResponse(401, "unauthorized access"));
-
-
             var patient = await _patientManager.FindByIdAsync(patientId);
 
-            if(patient is null && patientId != null)
+            if(patient is null)
                 return BadRequest(new ApiResponse(400, "invalid data entered"));
 
-            var room = new Room();
+            var room = await _unitOfWork.Repository<Room>().GetByIdAsync((int) roomId);
 
-            if(roomId != null)
-            {
-                room = await _unitOfWork.Repository<Room>().GetByIdAsync((int) roomId);
+            if(room is null)
+                return BadRequest(new ApiResponse(400, "invalid data entered"));
 
-                if(room is null)
-                    return BadRequest(new ApiResponse(400, "invalid data entered"));
-            }
-
-            var result = await _nurseCareService.GetNurseCareRecordsAsync(nurseId, patientId, roomId, dateTime);
+            var result = await _nurseCareService.GetNurseCareRecordsAsync(patientId, roomId);
 
             if (result.Count() == 0)
                 return NotFound(new ApiResponse(404, "no data found"));
 
             var mapped = await MapToNurseCareDto(result);
 
-            return Ok(mapped);
+            return Ok(mapped.OrderByDescending(x => x.DateTime));
         }
 
         [HttpDelete("care/delete")] // GET: /api/nurse/care/delete

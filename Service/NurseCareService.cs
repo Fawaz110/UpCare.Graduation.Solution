@@ -41,22 +41,13 @@ namespace Service
             return nurseCare;
         }
 
-        public async Task<List<NurseCare>> GetNurseCareRecordsAsync(string? nurseId, string? patientId, int? roomId, DateTime? dateTime)
+        public async Task<List<NurseCare>> GetNurseCareRecordsAsync(string patientId, int roomId)
         {
             var result = await _nurseCareRepository.GetAllRecordsAsync();
 
-            if (!string.IsNullOrEmpty(patientId))
-                result = result.Where(x => x.FK_PatientId == patientId).ToList();
+            result = result.Where(x => x.FK_PatientId == patientId).ToList();
 
-
-            if (!string.IsNullOrEmpty(nurseId))
-                result = result.Where(x => x.FK_NurseId == nurseId).ToList();
-
-            if(roomId!= 0 || roomId != null)
-                result = result.Where(x => x.FK_RoomId == roomId).ToList();
-
-            if (dateTime != DateTime.MinValue)
-                result = result.Where(x => x.DateTime >= dateTime).ToList();
+            result = result.Where(x => x.FK_RoomId == roomId).ToList();
 
             return result;  
         }

@@ -10,7 +10,7 @@ namespace Core.Services.Contract
 {
     public interface INurseCareService
     {
-        Task<List<NurseCare>> GetNurseCareRecordsAsync(string nurseId, string? patientId, int? roomId, DateTime? dateTime);
+        Task<List<NurseCare>> GetNurseCareRecordsAsync(string patientId, int roomId);
         Task<NurseCare> AddAsync(NurseCare nurseCare);
         Task<int> DeleteAsync(string patientId, string nurseId, int roomId, DateTime dateTime);
         Task<int> UpdateAsync(NurseCare nurseCare);
