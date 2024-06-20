@@ -328,7 +328,15 @@ namespace UpCare.Controllers
                 Medicines = mappedMedicine,
                 Radiologies = mappedRadiology,
                 Doctor = await _doctorManager.FindByIdAsync(item.FK_DoctorId),
-                Patient = await _patientManager.FindByIdAsync(item.FK_PatientId)
+                Patient = await _patientManager.FindByIdAsync(item.FK_PatientId),
+                CheckupClientSecret = item.CheckupClientSecret,
+                CheckupPaymentIntentId = item.CheckupPaymentIntentId,
+                MedicineClientSecret = item.MedicineClientSecret,
+                MedicinePaymentIntentId = item.MedicinePaymentIntentId,
+                PrescriptionClientSecret = item.PrescriptionClientSecret,
+                PrescriptionPaymentIntentId = item.PrescriptionPaymentIntentId,
+                RadiologyClientSecret = item.RadiologyClientSecret,
+                RadiologyPaymentIntentId = item.RadiologyPaymentIntentId
             };
 
         }
