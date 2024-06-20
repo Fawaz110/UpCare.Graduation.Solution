@@ -28,6 +28,9 @@ namespace UpCare.Controllers
         private readonly IAppointmentService _appointmentService;
         private readonly IConsultationService _consultationService;
         private readonly IPrescriptionService _prescriptionService;
+        private readonly ICheckupService _checkupService;
+        private readonly IRadiologyService _radiologyService;
+        private readonly IConfiguration _configuration;
 
         public PatientController(
             UserManager<Patient> patientManager,
@@ -37,7 +40,10 @@ namespace UpCare.Controllers
             IUnitOfWork unitOfWork,
             IAppointmentService appointmentService,
             IConsultationService consultationService,
-            IPrescriptionService prescriptionService)
+            IPrescriptionService prescriptionService,
+            ICheckupService checkupService,
+            IRadiologyService radiologyService,
+            IConfiguration configuration)
         {
             _authServices = authServices;
             _patientManager = patientManager;
@@ -47,6 +53,9 @@ namespace UpCare.Controllers
             _appointmentService = appointmentService;
             _consultationService = consultationService;
             _prescriptionService = prescriptionService;
+            _checkupService = checkupService;
+            _radiologyService = radiologyService;
+            _configuration = configuration;
         }
         [HttpPost("login")] // POST: /api/patient/login
         public async Task<ActionResult<UserDto>> Login(LoginDto model)
@@ -160,11 +169,12 @@ namespace UpCare.Controllers
         private async Task<PatientHistoryDto> MapToPatientHistoryDto(Patient patient)
         {
 
+            #region Get All Conversations
             var consultations = await _consultationService.GetByPatientIdAsync(patient.Id);
             var appointments = await _appointmentService.GetAllByPatientIdAsync(patient.Id);
 
             var mappedAppointments = new List<ConversationDto>();
-            if(appointments != null && appointments.Count() > 0)
+            if (appointments != null && appointments.Count() > 0)
                 foreach (var appointment in appointments)
                 {
                     var conversation = new ConversationDto
@@ -181,29 +191,58 @@ namespace UpCare.Controllers
             var mappedConsultation = new List<ConversationDto>();
             if (consultations != null && consultations.Count() > 0)
                 foreach (var consultation in consultations)
-            {
-                var conversation = new ConversationDto
                 {
-                    Doctor = await _doctorManager.FindByIdAsync(consultation.FK_DoctorId),
-                    DateTime = consultation.DateTime,
-                    Passed = (DateTime.UtcNow.AddMinutes(-30) > consultation.DateTime) ? true : false,
-                    Type = consultation.Type.ToString()
-                };
+                    var conversation = new ConversationDto
+                    {
+                        Doctor = await _doctorManager.FindByIdAsync(consultation.FK_DoctorId),
+                        DateTime = consultation.DateTime,
+                        Passed = (DateTime.UtcNow.AddMinutes(-30) > consultation.DateTime) ? true : false,
+                        Type = consultation.Type.ToString()
+                    };
 
-                mappedConsultation.Add(conversation);
-            }
+                    mappedConsultation.Add(conversation);
+                }
 
-            var conversations = mappedAppointments.Concat(mappedConsultation).OrderByDescending(x => x.DateTime).ToList();
-
-            var prescriptions = await _unitOfWork.Repository<Prescription>().GetAllAsync();
-
-            var patientPrescriptions = prescriptions.Where(p =>p.FK_PatientId == patient.Id).ToList();
-
-            var mappedPatientPrescription = await MapToPrescriptionDto(patientPrescriptions);
+            var conversations = mappedAppointments.Concat(mappedConsultation).OrderByDescending(x => x.DateTime).ToList(); 
+            #endregion
 
             var medicineHistory = new List<MedicineHistory>();
             var checkupHistory = new List<CheckupHistory>();
             var radiologyHistory = new List<RadiologyHistory>();
+
+            var checkupResults = (await _checkupService.GetAllResults()).Where(x => x.FK_PatientId == patient.Id).ToList();
+
+            foreach (var item in checkupResults)
+            {
+                var itemToAdd = new CheckupHistory
+                {
+                    Checkup = await _unitOfWork.Repository<Checkup>().GetByIdAsync(item.FK_ChecupId),
+                    DateTime = item.DateTime,
+                    Result = Path.Combine(_configuration["AssetsBaseUrl"], "Uploads\\Checkups", item.Result)
+                };
+
+                checkupHistory.Add(itemToAdd);
+            }
+
+            var radiologyResults = (await _radiologyService.GetAllResults()).Where(x => x.FK_PatientId == patient.Id);
+
+            foreach (var item in radiologyResults)
+            {
+                var itemToAdd = new RadiologyHistory
+                {
+                    Radiology = await _unitOfWork.Repository<Radiology>().GetByIdAsync(item.FK_RadiologyId),
+                    DateTime = item.DateTime,
+                    Result = Path.Combine(_configuration["AssetsBaseUrl"], "Uploads\\Radiologies", item.Result)
+                };
+
+                radiologyHistory.Add(itemToAdd);
+            }
+
+            var prescriptions = await _unitOfWork.Repository<Prescription>().GetAllAsync();
+
+            var patientPrescriptions = prescriptions.Where(p =>p.FK_PatientId == patient.Id && ((!string.IsNullOrEmpty(p.PrescriptionPaymentIntentId)) || !(string.IsNullOrEmpty(p.MedicinePaymentIntentId)))).ToList();
+
+            var mappedPatientPrescription = await MapToPrescriptionDto(patientPrescriptions);
 
             foreach (var pp in mappedPatientPrescription)
             {
@@ -215,21 +254,21 @@ namespace UpCare.Controllers
 
                 medicineHistory.AddRange(medicineList);
 
-                var checkupList = pp.Checkups.Select(c => new CheckupHistory
-                {
-                    Checkup = c,
-                    DateTime = pp.DateTime
-                });
+                //var checkupList = pp.Checkups.Select(c => new CheckupHistory
+                //{
+                //    Checkup = c,
+                //    DateTime = pp.DateTime
+                //});
 
-                checkupHistory.AddRange(checkupList);
+                //checkupHistory.AddRange(checkupList);
 
-                var radiologyList = pp.Radiologies.Select(r => new RadiologyHistory
-                {
-                    DateTime = pp.DateTime,
-                    Radiology = r
-                }).ToList();
+                //var radiologyList = pp.Radiologies.Select(r => new RadiologyHistory
+                //{
+                //    DateTime = pp.DateTime,
+                //    Radiology = r
+                //}).ToList();
 
-                radiologyHistory.AddRange(radiologyList);
+                //radiologyHistory.AddRange(radiologyList);
             }
 
             return new PatientHistoryDto

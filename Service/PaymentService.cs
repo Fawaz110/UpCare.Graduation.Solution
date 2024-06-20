@@ -65,6 +65,10 @@ namespace Service
                         {
                             var medicine = await _unitOfWork.Repository<Medicine>().GetByIdAsync(item.FK_MedicineId);
 
+                            medicine.Quantity -= 1;
+
+                            _unitOfWork.Repository<Medicine>().Update(medicine);
+
                             medicineTotalPrice += medicine.Price;
                         }
                     }
@@ -133,6 +137,10 @@ namespace Service
                         {
                             var medicine = await _unitOfWork.Repository<Medicine>().GetByIdAsync(item.FK_MedicineId);
 
+                            medicine.Quantity -= 1;
+
+                            _unitOfWork.Repository<Medicine>().Update(medicine);
+
                             medicineTotalPrice += medicine.Price;
                         }
                     }
@@ -192,6 +200,10 @@ namespace Service
                         foreach (var item in medicineForBill)
                         {
                             var medicine = await _unitOfWork.Repository<Medicine>().GetByIdAsync(item.FK_MedicineId);
+
+                            medicine.Quantity -= 1;
+
+                            _unitOfWork.Repository<Medicine>().Update(medicine);
 
                             medicineTotalPrice += medicine.Price;
                         }

@@ -6,5 +6,6 @@ namespace UpCare.DTOs.PatientDtos
     {
         public Radiology Radiology { get; set; }
         public DateTime DateTime { get; set; }
+        public string Result { get; set; }
     }
 }

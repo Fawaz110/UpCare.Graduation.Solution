@@ -67,6 +67,24 @@ namespace UpCare.Controllers
             return Ok(await MapToPrescriptionDto(prescription));
         }
 
+        [HttpGet("last/{patientId}")] // GET: /api/prescription/last
+        public async Task<ActionResult<PrescriptionDto>> GetLastPrescription(string patientId)
+        {
+            var patient = await _patientManager.FindByIdAsync(patientId);
+
+            if (patient is null)
+                return NotFound(new ApiResponse(404, "no data matches found"));
+
+            var list = await _prescriptionService.GetAllPrescriptionAsync(null, patientId);
+
+            if (list is null | list?.Count() == 0)
+                return NotFound(new ApiResponse(404, "no data found"));
+
+            var mapped = await MapToPrescriptionDto(list.OrderBy(x => x.DateTime).LastOrDefault());
+
+            return Ok(mapped);
+        }
+
         [HttpPost("add")] // POST: /api/prescription/add
         public async Task<ActionResult<SucceededToAdd>> AddPrescrition([FromBody] PrescritionToAddDto model)
         {

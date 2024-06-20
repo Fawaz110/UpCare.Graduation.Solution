@@ -146,8 +146,10 @@ namespace UpCare.Controllers
                     if(!done)
                     {
                         var checkup = await _unitOfWork.Repository<Checkup>().GetByIdAsync(checkupInBill.FK_CheckupId);
-                    
-                        checkups.Add(checkup);
+
+
+                        if(checkup != null)
+                            checkups.Add(checkup);
                     }
                 }
 
@@ -227,8 +229,6 @@ namespace UpCare.Controllers
             else
                 return BadRequest(new ApiResponse(400, "there is no checkup matches id"));
         }
-
-
 
         // private methods to map
         private async Task<PatientCheckupToReturnDto> MaptoPatientCheckupDto(PatientCheckup data)

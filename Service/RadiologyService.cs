@@ -38,8 +38,6 @@ namespace Service
             }
             else
             {
-                radiology.Type = entity.Type;
-
                 radiology.Price = entity.Price;
 
                 _unitOfWork.Repository<Radiology>().Update(radiology);

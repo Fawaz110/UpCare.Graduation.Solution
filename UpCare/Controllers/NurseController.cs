@@ -118,7 +118,7 @@ namespace UpCare.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Nurse>> GetSpecificDoctor(string id)
+        public async Task<ActionResult<Nurse>> GetSpecificNurse(string id)
         {
             var nurse = await _nurseManager.FindByIdAsync(id);
 
